@@ -11,8 +11,8 @@ namespace GBASharp
         #region 0x
 
         public static void Code0x00() { }
-        public static void Code0x01() { }
-        public static void Code0x02() { }
+        public static void Code0x01() { OpcodeHelpers.LDxBC(); }
+        public static void Code0x02() { OpcodeHelpers.LDmBC(); }
         public static void Code0x03() { }
         public static void Code0x04() { }
         public static void Code0x05() { }
@@ -32,8 +32,8 @@ namespace GBASharp
         #region 1x
 
         public static void Code0x10() { }
-        public static void Code0x11() { }
-        public static void Code0x12() { }
+        public static void Code0x11() { OpcodeHelpers.LDxDE(); }
+        public static void Code0x12() { OpcodeHelpers.LDmDE(); }
         public static void Code0x13() { }
         public static void Code0x14() { }
         public static void Code0x15() { }
@@ -53,8 +53,8 @@ namespace GBASharp
         #region 2x
 
         public static void Code0x20() { }
-        public static void Code0x21() { }
-        public static void Code0x22() { }
+        public static void Code0x21() { OpcodeHelpers.LDxHL(); }
+        public static void Code0x22() { OpcodeHelpers.LDmHLI(); }
         public static void Code0x23() { }
         public static void Code0x24() { }
         public static void Code0x25() { }
@@ -74,8 +74,8 @@ namespace GBASharp
         #region 3x
 
         public static void Code0x30() { }
-        public static void Code0x31() { }
-        public static void Code0x32() { }
+        public static void Code0x31() { OpcodeHelpers.LDxSP(); }
+        public static void Code0x32() { OpcodeHelpers.LDmHLD(); }
         public static void Code0x33() { }
         public static void Code0x34() { }
         public static void Code0x35() { }
@@ -155,7 +155,7 @@ namespace GBASharp
 
         #endregion
 
-        #region 7x
+        #region 7x (Missing HALT instruction)
 
         public static void Code0x70() { OpcodeHelpers.LDxHL(CPU.B_Register); }
         public static void Code0x71() { OpcodeHelpers.LDxHL(CPU.C_Register); }
@@ -570,5 +570,23 @@ namespace GBASharp
         public static void LDxL(ushort value) { CPU.L_Register = CPU.memory[value]; }
 
         public static void LDxHL(byte value) { CPU.memory[CPU.HL_Register] = value; }
+
+        public static void LDxBC() { CPU.BC_Register = CPU.GetWordFromPC(); }
+
+        public static void LDxDE() { CPU.DE_Register = CPU.GetWordFromPC(); }
+
+        public static void LDxHL() { CPU.HL_Register = CPU.GetWordFromPC(); }
+
+        public static void LDxSP() { CPU.reg_sp = CPU.GetWordFromPC(); }
+
+        public static void LDmBC() { CPU.memory[CPU.BC_Register] = CPU.reg_a; }
+
+        public static void LDmDE() { CPU.memory[CPU.DE_Register] = CPU.reg_a; }
+
+        public static void LDmHLI() { CPU.memory[CPU.HL_Register] = CPU.reg_a; CPU.HL_Register += 0x1; } //Increment
+
+        public static void LDmHLD() { CPU.memory[CPU.HL_Register] = CPU.reg_a; CPU.HL_Register -= 0x1; } //Decrement
+
+        public static void LDmSP() { CPU.memory[CPU.reg_sp] = CPU.reg_a; }
     }
 }

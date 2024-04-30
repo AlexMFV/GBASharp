@@ -90,8 +90,8 @@ namespace OpcodeTests
         #region 0x
 
         [TestMethod] public void Test0x00() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x01() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x02() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0x01() { TestOpcode(0x01, LoadTests("01")); }
+        [TestMethod] public void Test0x02() { TestOpcode(0x02, LoadTests("02")); }
         [TestMethod] public void Test0x03() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x04() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x05() { Assert.Inconclusive(); }
@@ -111,8 +111,8 @@ namespace OpcodeTests
         #region 1x
 
         [TestMethod] public void Test0x10() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x11() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x12() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0x11() { TestOpcode(0x11, LoadTests("11")); }
+        [TestMethod] public void Test0x12() { TestOpcode(0x12, LoadTests("12")); }
         [TestMethod] public void Test0x13() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x14() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x15() { Assert.Inconclusive(); }
@@ -132,8 +132,8 @@ namespace OpcodeTests
         #region 2x
 
         [TestMethod] public void Test0x20() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x21() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x22() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0x21() { TestOpcode(0x21, LoadTests("21")); }
+        [TestMethod] public void Test0x22() { TestOpcode(0x22, LoadTests("22")); }
         [TestMethod] public void Test0x23() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x24() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x25() { Assert.Inconclusive(); }
@@ -153,8 +153,8 @@ namespace OpcodeTests
         #region 3x
 
         [TestMethod] public void Test0x30() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x31() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0x32() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0x31() { TestOpcode(0x31, LoadTests("31")); }
+        [TestMethod] public void Test0x32() { TestOpcode(0x32, LoadTests("32")); }
         [TestMethod] public void Test0x33() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x34() { Assert.Inconclusive(); }
         [TestMethod] public void Test0x35() { Assert.Inconclusive(); }

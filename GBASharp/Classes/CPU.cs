@@ -481,6 +481,20 @@ namespace GBASharp
 
         #endregion
 
+        public static ushort GetWordFromPC()
+        {
+            byte lower = GetByteFromPC();
+            byte upper = GetByteFromPC();
+            return (ushort)(upper << 8 | lower);
+        }
+
+        public static byte GetByteFromPC()
+        {
+            byte value = memory[pc];
+            pc += 0x1;
+            return value;
+        }
+
         public static void BootSequence()
         {
             //Clear and Load Rom
