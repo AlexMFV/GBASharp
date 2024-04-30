@@ -92,87 +92,87 @@ namespace GBASharp
 
         #endregion
 
-        #region 4x
+        #region 4x (Done)
 
-        public static void Code0x40() { }
-        public static void Code0x41() { }
-        public static void Code0x42() { }
-        public static void Code0x43() { }
-        public static void Code0x44() { }
-        public static void Code0x45() { }
-        public static void Code0x46() { }
-        public static void Code0x47() { }
-        public static void Code0x48() { }
-        public static void Code0x49() { }
-        public static void Code0x4A() { }
-        public static void Code0x4B() { }
-        public static void Code0x4C() { }
-        public static void Code0x4D() { }
-        public static void Code0x4E() { }
-        public static void Code0x4F() { }
-
-        #endregion
-
-        #region 5x
-
-        public static void Code0x50() { }
-        public static void Code0x51() { }
-        public static void Code0x52() { }
-        public static void Code0x53() { }
-        public static void Code0x54() { }
-        public static void Code0x55() { }
-        public static void Code0x56() { }
-        public static void Code0x57() { }
-        public static void Code0x58() { }
-        public static void Code0x59() { }
-        public static void Code0x5A() { }
-        public static void Code0x5B() { }
-        public static void Code0x5C() { }
-        public static void Code0x5D() { }
-        public static void Code0x5E() { }
-        public static void Code0x5F() { }
+        public static void Code0x40() { OpcodeHelpers.LDxB(CPU.B_Register); }
+        public static void Code0x41() { OpcodeHelpers.LDxB(CPU.C_Register); }
+        public static void Code0x42() { OpcodeHelpers.LDxB(CPU.D_Register); }
+        public static void Code0x43() { OpcodeHelpers.LDxB(CPU.E_Register); }
+        public static void Code0x44() { OpcodeHelpers.LDxB(CPU.H_Register); }
+        public static void Code0x45() { OpcodeHelpers.LDxB(CPU.L_Register); }
+        public static void Code0x46() { OpcodeHelpers.LDxB(CPU.HL_Register); }
+        public static void Code0x47() { OpcodeHelpers.LDxB(CPU.reg_a); }
+        public static void Code0x48() { OpcodeHelpers.LDxC(CPU.B_Register); }
+        public static void Code0x49() { OpcodeHelpers.LDxC(CPU.C_Register); }
+        public static void Code0x4A() { OpcodeHelpers.LDxC(CPU.D_Register); }
+        public static void Code0x4B() { OpcodeHelpers.LDxC(CPU.E_Register); }
+        public static void Code0x4C() { OpcodeHelpers.LDxC(CPU.H_Register); }
+        public static void Code0x4D() { OpcodeHelpers.LDxC(CPU.L_Register); }
+        public static void Code0x4E() { OpcodeHelpers.LDxC(CPU.HL_Register); }
+        public static void Code0x4F() { OpcodeHelpers.LDxC(CPU.reg_a); }
 
         #endregion
 
-        #region 6x
+        #region 5x (Done)
 
-        public static void Code0x60() { }
-        public static void Code0x61() { }
-        public static void Code0x62() { }
-        public static void Code0x63() { }
-        public static void Code0x64() { }
-        public static void Code0x65() { }
-        public static void Code0x66() { }
-        public static void Code0x67() { }
-        public static void Code0x68() { }
-        public static void Code0x69() { }
-        public static void Code0x6A() { }
-        public static void Code0x6B() { }
-        public static void Code0x6C() { }
-        public static void Code0x6D() { }
-        public static void Code0x6E() { }
-        public static void Code0x6F() { }
+        public static void Code0x50() { OpcodeHelpers.LDxD(CPU.B_Register); }
+        public static void Code0x51() { OpcodeHelpers.LDxD(CPU.C_Register); }
+        public static void Code0x52() { OpcodeHelpers.LDxD(CPU.D_Register); }
+        public static void Code0x53() { OpcodeHelpers.LDxD(CPU.E_Register); }
+        public static void Code0x54() { OpcodeHelpers.LDxD(CPU.H_Register); }
+        public static void Code0x55() { OpcodeHelpers.LDxD(CPU.L_Register); }
+        public static void Code0x56() { OpcodeHelpers.LDxD(CPU.HL_Register); }
+        public static void Code0x57() { OpcodeHelpers.LDxD(CPU.reg_a); }
+        public static void Code0x58() { OpcodeHelpers.LDxE(CPU.B_Register); }
+        public static void Code0x59() { OpcodeHelpers.LDxE(CPU.C_Register); }
+        public static void Code0x5A() { OpcodeHelpers.LDxE(CPU.D_Register); }
+        public static void Code0x5B() { OpcodeHelpers.LDxE(CPU.E_Register); }
+        public static void Code0x5C() { OpcodeHelpers.LDxE(CPU.H_Register); }
+        public static void Code0x5D() { OpcodeHelpers.LDxE(CPU.L_Register); }
+        public static void Code0x5E() { OpcodeHelpers.LDxE(CPU.HL_Register); }
+        public static void Code0x5F() { OpcodeHelpers.LDxE(CPU.reg_a); }
+
+        #endregion
+
+        #region 6x (Done)
+
+        public static void Code0x60() { OpcodeHelpers.LDxH(CPU.B_Register); }
+        public static void Code0x61() { OpcodeHelpers.LDxH(CPU.C_Register); }
+        public static void Code0x62() { OpcodeHelpers.LDxH(CPU.D_Register); }
+        public static void Code0x63() { OpcodeHelpers.LDxH(CPU.E_Register); }
+        public static void Code0x64() { OpcodeHelpers.LDxH(CPU.H_Register); }
+        public static void Code0x65() { OpcodeHelpers.LDxH(CPU.L_Register); }
+        public static void Code0x66() { OpcodeHelpers.LDxH(CPU.HL_Register); }
+        public static void Code0x67() { OpcodeHelpers.LDxH(CPU.reg_a); }
+        public static void Code0x68() { OpcodeHelpers.LDxL(CPU.B_Register); }
+        public static void Code0x69() { OpcodeHelpers.LDxL(CPU.C_Register); }
+        public static void Code0x6A() { OpcodeHelpers.LDxL(CPU.D_Register); }
+        public static void Code0x6B() { OpcodeHelpers.LDxL(CPU.E_Register); }
+        public static void Code0x6C() { OpcodeHelpers.LDxL(CPU.H_Register); }
+        public static void Code0x6D() { OpcodeHelpers.LDxL(CPU.L_Register); }
+        public static void Code0x6E() { OpcodeHelpers.LDxL(CPU.HL_Register); }
+        public static void Code0x6F() { OpcodeHelpers.LDxL(CPU.reg_a); }
 
         #endregion
 
         #region 7x
 
-        public static void Code0x70() { }
-        public static void Code0x71() { }
-        public static void Code0x72() { }
-        public static void Code0x73() { }
-        public static void Code0x74() { }
-        public static void Code0x75() { }
+        public static void Code0x70() { OpcodeHelpers.LDxHL(CPU.B_Register); }
+        public static void Code0x71() { OpcodeHelpers.LDxHL(CPU.C_Register); }
+        public static void Code0x72() { OpcodeHelpers.LDxHL(CPU.D_Register); }
+        public static void Code0x73() { OpcodeHelpers.LDxHL(CPU.E_Register); }
+        public static void Code0x74() { OpcodeHelpers.LDxHL(CPU.H_Register); }
+        public static void Code0x75() { OpcodeHelpers.LDxHL(CPU.L_Register); }
         public static void Code0x76() { }
-        public static void Code0x77() { }
-        public static void Code0x78() { }
-        public static void Code0x79() { }
-        public static void Code0x7A() { }
-        public static void Code0x7B() { }
-        public static void Code0x7C() { }
-        public static void Code0x7D() { }
-        public static void Code0x7E() { }
-        public static void Code0x7F() { }
+        public static void Code0x77() { OpcodeHelpers.LDxHL(CPU.reg_a); }
+        public static void Code0x78() { OpcodeHelpers.LDxA(CPU.B_Register); }
+        public static void Code0x79() { OpcodeHelpers.LDxA(CPU.C_Register); }
+        public static void Code0x7A() { OpcodeHelpers.LDxA(CPU.D_Register); }
+        public static void Code0x7B() { OpcodeHelpers.LDxA(CPU.E_Register); }
+        public static void Code0x7C() { OpcodeHelpers.LDxA(CPU.H_Register); }
+        public static void Code0x7D() { OpcodeHelpers.LDxA(CPU.L_Register); }
+        public static void Code0x7E() { OpcodeHelpers.LDxA(CPU.HL_Register); }
+        public static void Code0x7F() { OpcodeHelpers.LDxA(CPU.reg_a); }
 
         #endregion
 
@@ -540,5 +540,35 @@ namespace GBASharp
             SetFlagH((byte)((CPU.reg_a & 0xf) - (CPU.memory[reg] & 0xf))); //Set if overflow from bit 3
             SetFlagC(CPU.memory[reg] > CPU.reg_a); //Set if overflow from 7 bit
         }
+        
+        public static void LDxA(byte value) { CPU.reg_a = value; }
+
+        public static void LDxA(ushort value) { CPU.reg_a = CPU.memory[value]; }
+
+        public static void LDxB(byte value) { CPU.B_Register = value; }
+
+        public static void LDxB(ushort value) { CPU.B_Register = CPU.memory[value]; }
+
+        public static void LDxC(byte value) { CPU.C_Register = value; }
+
+        public static void LDxC(ushort value) { CPU.C_Register = CPU.memory[value]; }
+
+        public static void LDxD(byte value) { CPU.D_Register = value; }
+
+        public static void LDxD(ushort value) { CPU.D_Register = CPU.memory[value]; }
+
+        public static void LDxE(byte value) { CPU.E_Register = value; }
+
+        public static void LDxE(ushort value) { CPU.E_Register = CPU.memory[value]; }
+
+        public static void LDxH(byte value) { CPU.H_Register = value; }
+
+        public static void LDxH(ushort value) { CPU.H_Register = CPU.memory[value]; }
+
+        public static void LDxL(byte value) { CPU.L_Register = value; }
+
+        public static void LDxL(ushort value) { CPU.L_Register = CPU.memory[value]; }
+
+        public static void LDxHL(byte value) { CPU.memory[CPU.HL_Register] = value; }
     }
 }

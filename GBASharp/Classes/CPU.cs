@@ -43,16 +43,16 @@ namespace GBASharp
         public static byte op_N = 0x0;
 
         public static ushort BC_Register { get { return reg_bc; } set { reg_bc = value; } }
-        public static byte B_Register { get { return (byte)(reg_bc >> 8 & 0xff); } set { reg_bc = (ushort)((reg_bc >> 8 & 0xff) << 8 | value); } }
-        public static byte C_Register { get { return (byte)(reg_bc & 0xff); } set { reg_bc = (ushort)(value << 8 | reg_bc & 0xff); } }
+        public static byte B_Register { get { return (byte)(reg_bc >> 8 & 0xff); } set { reg_bc = (ushort)(value << 8 | reg_bc & 0xff); } }
+        public static byte C_Register { get { return (byte)(reg_bc & 0xff); } set { reg_bc = (ushort)((reg_bc >> 8 & 0xff) << 8 | value); } }
 
         public static ushort DE_Register { get { return reg_de; } set { reg_de = value; } }
-        public static byte D_Register { get { return (byte)(reg_de >> 8 & 0xff); } set { reg_de = (ushort)((reg_de >> 8 & 0xff) << 8 | value); } }
-        public static byte E_Register { get { return (byte)(reg_de & 0xff); } set { reg_de = (ushort)(value << 8 | reg_de & 0xff); } }
+        public static byte D_Register { get { return (byte)(reg_de >> 8 & 0xff); } set { reg_de = (ushort)(value << 8 | reg_de & 0xff); } }
+        public static byte E_Register { get { return (byte)(reg_de & 0xff); } set { reg_de = (ushort)((reg_de >> 8 & 0xff) << 8 | value); } }
 
         public static ushort HL_Register { get { return reg_hl; } set { reg_hl = value; } }
-        public static byte H_Register { get { return (byte)(reg_hl >> 8 & 0xff); } set { reg_hl = (ushort)((reg_hl >> 8 & 0xff) << 8 | value); } }
-        public static byte L_Register { get { return (byte)(reg_hl & 0xff); } set { reg_hl = (ushort)(value << 8 | reg_hl & 0xff); } }
+        public static byte H_Register { get { return (byte)(reg_hl >> 8 & 0xff); } set { reg_hl = (ushort)(value << 8 | reg_hl & 0xff); } }
+        public static byte L_Register { get { return (byte)(reg_hl & 0xff); } set { reg_hl = (ushort)((reg_hl >> 8 & 0xff) << 8 | value); } }
 
         //Memory Breakdown
         //0000 - 3FFF / 16 KiB ROM bank 00              || From cartridge, usually a fixed bank
