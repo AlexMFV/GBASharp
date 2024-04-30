@@ -81,6 +81,8 @@ namespace OpcodeTests
                     col.Add(op);
                 }
             }
+            else
+                throw new FileNotFoundException();
 
             return col;
         }

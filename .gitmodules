@@ -1,0 +1,3 @@
+[submodule "GBASharp/GameboyCPUTests"]
+	path = GBASharp/GameboyCPUTests
+	url = https://github.com/AlexMFV/GameboyCPUTests.git
