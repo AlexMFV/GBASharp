@@ -176,16 +176,16 @@ namespace GBASharp
 
         #endregion
 
-        #region 8x
+        #region 8x (Done)
 
-        public static void Code0x80() { }
-        public static void Code0x81() { }
-        public static void Code0x82() { }
-        public static void Code0x83() { }
-        public static void Code0x84() { }
-        public static void Code0x85() { }
-        public static void Code0x86() { }
-        public static void Code0x87() { }
+        public static void Code0x80() { OpcodeHelpers.ADD(CPU.B_Register); }
+        public static void Code0x81() { OpcodeHelpers.ADD(CPU.C_Register); }
+        public static void Code0x82() { OpcodeHelpers.ADD(CPU.D_Register); }
+        public static void Code0x83() { OpcodeHelpers.ADD(CPU.E_Register); }
+        public static void Code0x84() { OpcodeHelpers.ADD(CPU.H_Register); }
+        public static void Code0x85() { OpcodeHelpers.ADD(CPU.L_Register); }
+        public static void Code0x86() { OpcodeHelpers.ADDHL(CPU.HL_Register); }
+        public static void Code0x87() { OpcodeHelpers.ADD(CPU.reg_a); }
         public static void Code0x88() { OpcodeHelpers.ADC(CPU.B_Register); }
         public static void Code0x89() { OpcodeHelpers.ADC(CPU.C_Register); }
         public static void Code0x8A() { OpcodeHelpers.ADC(CPU.D_Register); }
@@ -197,66 +197,66 @@ namespace GBASharp
 
         #endregion
 
-        #region 9x
+        #region 9x (Done)
 
-        public static void Code0x90() { }
-        public static void Code0x91() { }
-        public static void Code0x92() { }
-        public static void Code0x93() { }
-        public static void Code0x94() { }
-        public static void Code0x95() { }
-        public static void Code0x96() { }
-        public static void Code0x97() { }
-        public static void Code0x98() { }
-        public static void Code0x99() { }
-        public static void Code0x9A() { }
-        public static void Code0x9B() { }
-        public static void Code0x9C() { }
-        public static void Code0x9D() { }
-        public static void Code0x9E() { }
-        public static void Code0x9F() { }
-
-        #endregion
-
-        #region Ax
-
-        public static void Code0xA0() { }
-        public static void Code0xA1() { }
-        public static void Code0xA2() { }
-        public static void Code0xA3() { }
-        public static void Code0xA4() { }
-        public static void Code0xA5() { }
-        public static void Code0xA6() { }
-        public static void Code0xA7() { }
-        public static void Code0xA8() { }
-        public static void Code0xA9() { }
-        public static void Code0xAA() { }
-        public static void Code0xAB() { }
-        public static void Code0xAC() { }
-        public static void Code0xAD() { }
-        public static void Code0xAE() { }
-        public static void Code0xAF() { }
+        public static void Code0x90() { OpcodeHelpers.SUB(CPU.B_Register); }
+        public static void Code0x91() { OpcodeHelpers.SUB(CPU.C_Register); }
+        public static void Code0x92() { OpcodeHelpers.SUB(CPU.D_Register); }
+        public static void Code0x93() { OpcodeHelpers.SUB(CPU.E_Register); }
+        public static void Code0x94() { OpcodeHelpers.SUB(CPU.H_Register); }
+        public static void Code0x95() { OpcodeHelpers.SUB(CPU.L_Register); }
+        public static void Code0x96() { OpcodeHelpers.SUBHL(CPU.HL_Register); }
+        public static void Code0x97() { OpcodeHelpers.SUB(CPU.reg_a); }
+        public static void Code0x98() { OpcodeHelpers.SBC(CPU.B_Register); }
+        public static void Code0x99() { OpcodeHelpers.SBC(CPU.C_Register); }
+        public static void Code0x9A() { OpcodeHelpers.SBC(CPU.D_Register); }
+        public static void Code0x9B() { OpcodeHelpers.SBC(CPU.E_Register); }
+        public static void Code0x9C() { OpcodeHelpers.SBC(CPU.H_Register); }
+        public static void Code0x9D() { OpcodeHelpers.SBC(CPU.L_Register); }
+        public static void Code0x9E() { OpcodeHelpers.SBCHL(CPU.HL_Register); }
+        public static void Code0x9F() { OpcodeHelpers.SBC(CPU.reg_a); }
 
         #endregion
 
-        #region Bx
+        #region Ax (Done)
 
-        public static void Code0xB0() { }
-        public static void Code0xB1() { }
-        public static void Code0xB2() { }
-        public static void Code0xB3() { }
-        public static void Code0xB4() { }
-        public static void Code0xB5() { }
-        public static void Code0xB6() { }
-        public static void Code0xB7() { }
-        public static void Code0xB8() { }
-        public static void Code0xB9() { }
-        public static void Code0xBA() { }
-        public static void Code0xBB() { }
-        public static void Code0xBC() { }
-        public static void Code0xBD() { }
-        public static void Code0xBE() { }
-        public static void Code0xBF() { }
+        public static void Code0xA0() { OpcodeHelpers.AND(CPU.B_Register); }
+        public static void Code0xA1() { OpcodeHelpers.AND(CPU.C_Register); }
+        public static void Code0xA2() { OpcodeHelpers.AND(CPU.D_Register); }
+        public static void Code0xA3() { OpcodeHelpers.AND(CPU.E_Register); }
+        public static void Code0xA4() { OpcodeHelpers.AND(CPU.H_Register); }
+        public static void Code0xA5() { OpcodeHelpers.AND(CPU.L_Register); }
+        public static void Code0xA6() { OpcodeHelpers.ANDHL(CPU.HL_Register); }
+        public static void Code0xA7() { OpcodeHelpers.AND(CPU.reg_a); }
+        public static void Code0xA8() { OpcodeHelpers.XOR(CPU.B_Register); }
+        public static void Code0xA9() { OpcodeHelpers.XOR(CPU.C_Register); }
+        public static void Code0xAA() { OpcodeHelpers.XOR(CPU.D_Register); }
+        public static void Code0xAB() { OpcodeHelpers.XOR(CPU.E_Register); }
+        public static void Code0xAC() { OpcodeHelpers.XOR(CPU.H_Register); }
+        public static void Code0xAD() { OpcodeHelpers.XOR(CPU.L_Register); }
+        public static void Code0xAE() { OpcodeHelpers.XORHL(CPU.HL_Register); }
+        public static void Code0xAF() { OpcodeHelpers.XOR(CPU.reg_a); }
+
+        #endregion
+
+        #region Bx (Done)
+
+        public static void Code0xB0() { OpcodeHelpers.OR(CPU.B_Register); }
+        public static void Code0xB1() { OpcodeHelpers.OR(CPU.C_Register); }
+        public static void Code0xB2() { OpcodeHelpers.OR(CPU.D_Register); }
+        public static void Code0xB3() { OpcodeHelpers.OR(CPU.E_Register); }
+        public static void Code0xB4() { OpcodeHelpers.OR(CPU.H_Register); }
+        public static void Code0xB5() { OpcodeHelpers.OR(CPU.L_Register); }
+        public static void Code0xB6() { OpcodeHelpers.ORHL(CPU.HL_Register); }
+        public static void Code0xB7() { OpcodeHelpers.OR(CPU.reg_a); }
+        public static void Code0xB8() { OpcodeHelpers.CP(CPU.B_Register); }
+        public static void Code0xB9() { OpcodeHelpers.CP(CPU.C_Register); }
+        public static void Code0xBA() { OpcodeHelpers.CP(CPU.D_Register); }
+        public static void Code0xBB() { OpcodeHelpers.CP(CPU.E_Register); }
+        public static void Code0xBC() { OpcodeHelpers.CP(CPU.H_Register); }
+        public static void Code0xBD() { OpcodeHelpers.CP(CPU.L_Register); }
+        public static void Code0xBE() { OpcodeHelpers.CPHL(CPU.HL_Register); }
+        public static void Code0xBF() { OpcodeHelpers.CP(CPU.reg_a); }
 
         #endregion
 
@@ -347,52 +347,198 @@ namespace GBASharp
 
     public static class OpcodeHelpers
     {
+        public static void SetFlagZ(ushort sum) { CPU.flag_z = (byte)sum == 0x0 ? (byte)0x1 : (byte)0x0; }
+        public static void SetFlagN(bool result) { CPU.flag_n = result ? (byte)0x1 : (byte)0x0; }
+        public static void SetFlagH(byte value) { CPU.flag_h = (byte)(value > 0xf ? 0x1 : 0x0); }
+        public static void SetFlagH(bool result) { CPU.flag_h = (byte)(result ? 0x1 : 0x0); }
+        public static void SetFlagC(bool result) { CPU.flag_c = result ? (byte)0x1 : (byte)0x0; }
+
         public static void ADC(byte reg)
         {
-            byte regA = CPU.reg_a;
-            ushort sum = (ushort)(regA + reg + CPU.flag_c);
+            ushort sum = (ushort)(CPU.reg_a + reg + CPU.flag_c);
 
-            if ((byte)sum == 0x0)
-                CPU.flag_z = 0x1;
-            else
-                CPU.flag_z = 0x0;
-
-            CPU.flag_n = 0x0;
-
-            byte finalResult = (byte)((regA & 0xf) + (reg & 0xf) + CPU.flag_c);
-
-            CPU.flag_h = (byte)(finalResult > 0xf ? 0x1 : 0x0);
-            
-            if(sum > 0xff) //Overflow from 7 bit (whole value)
-                CPU.flag_c = 0x1;
-            else
-                CPU.flag_c = 0x0;
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH((byte)((CPU.reg_a & 0xf) + (reg & 0xf) + CPU.flag_c)); //Overflow from bit 3
+            SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
 
             CPU.reg_a = (byte)(sum & 0xff); //Since we are converting from a ushort to a byte we only want the first byte
         }
 
         public static void ADCHL(ushort reg)
         {
-            byte regA = CPU.reg_a;
-            ushort sum = (ushort)(regA + CPU.memory[reg] + CPU.flag_c);
+            ushort sum = (ushort)(CPU.reg_a + CPU.memory[reg] + CPU.flag_c);
 
-            if ((byte)sum == 0x0)
-                CPU.flag_z = 0x1;
-            else
-                CPU.flag_z = 0x0;
-
-            CPU.flag_n = 0x0;
-
-            byte finalResult = (byte)((regA & 0xf) + (CPU.memory[reg] & 0xf) + CPU.flag_c);
-
-            CPU.flag_h = (byte)(finalResult > 0xf ? 0x1 : 0x0);
-
-            if (sum > 0xff) //Overflow from 7 bit (whole value)
-                CPU.flag_c = 0x1;
-            else
-                CPU.flag_c = 0x0;
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH((byte)((CPU.reg_a & 0xf) + (CPU.memory[reg] & 0xf) + CPU.flag_c)); //Overflow from bit 3
+            SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
 
             CPU.reg_a = (byte)(sum & 0xff); //Since we are converting from a ushort to a byte we only want the first byte
+        }
+
+        public static void ADD(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a + reg);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH((byte)((CPU.reg_a & 0xf) + (reg & 0xf))); //Overflow from bit 3
+            SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void ADDHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a + CPU.memory[reg]);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH((byte)((CPU.reg_a & 0xf) + (CPU.memory[reg] & 0xf))); //Overflow from bit 3
+            SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void SBC(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a - reg - CPU.flag_c);
+
+            SetFlagZ(sum);
+            SetFlagN(true);
+            SetFlagH((byte)((CPU.reg_a & 0xf) - (reg & 0xf) - CPU.flag_c)); //Overflow from bit 3
+            SetFlagC((reg + CPU.flag_c) > CPU.reg_a); //Overflow from 7 bit (whole value)
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void SBCHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a - CPU.memory[reg] - CPU.flag_c);
+
+            SetFlagZ(sum);
+            SetFlagN(true);
+            SetFlagH((byte)((CPU.reg_a & 0xf) - (CPU.memory[reg] & 0xf) - CPU.flag_c)); //Overflow from bit 3
+            SetFlagC((CPU.memory[reg] + CPU.flag_c) > CPU.reg_a); //Overflow from 7 bit (whole value)
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void SUB(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a - reg);
+
+            SetFlagZ(sum);
+            SetFlagN(true);
+            SetFlagH((byte)((CPU.reg_a & 0xf) - (reg & 0xf))); //Overflow from bit 3
+            SetFlagC(reg > CPU.reg_a); //Overflow from 7 bit (whole value)
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void SUBHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a - CPU.memory[reg]);
+
+            SetFlagZ(sum);
+            SetFlagN(true);
+            SetFlagH((byte)((CPU.reg_a & 0xf) - (CPU.memory[reg] & 0xf))); //Overflow from bit 3
+            SetFlagC(CPU.memory[reg] > CPU.reg_a); //Overflow from 7 bit (whole value)
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void AND(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a & reg);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH(true); //Set 0x1
+            SetFlagC(false); //Set 0x0
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void ANDHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a & CPU.memory[reg]);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH(true); //Set 0x1
+            SetFlagC(false); //Set 0x0
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void XOR(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a ^ reg);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH(false); //Set 0x0
+            SetFlagC(false); //Set 0x0
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void XORHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a ^ CPU.memory[reg]);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH(false); //Set 0x0
+            SetFlagC(false); //Set 0x0
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void OR(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a | reg);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH(false); //Set 0x0
+            SetFlagC(false); //Set 0x0
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void ORHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a | CPU.memory[reg]);
+
+            SetFlagZ(sum);
+            SetFlagN(false);
+            SetFlagH(false); //Set 0x0
+            SetFlagC(false); //Set 0x0
+
+            CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void CP(byte reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a - reg);
+
+            SetFlagZ(sum);
+            SetFlagN(true);
+            SetFlagH((byte)((CPU.reg_a & 0xf) - (reg & 0xf))); //Set if overflow from bit 3
+            SetFlagC(reg > CPU.reg_a); //Set if overflow from 7 bit
+        }
+
+        public static void CPHL(ushort reg)
+        {
+            ushort sum = (ushort)(CPU.reg_a - CPU.memory[reg]);
+
+            SetFlagZ(sum);
+            SetFlagN(true);
+            SetFlagH((byte)((CPU.reg_a & 0xf) - (CPU.memory[reg] & 0xf))); //Set if overflow from bit 3
+            SetFlagC(CPU.memory[reg] > CPU.reg_a); //Set if overflow from 7 bit
         }
     }
 }
