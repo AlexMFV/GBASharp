@@ -23,6 +23,7 @@ namespace GBASharp
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Raylib.BLACK);
                 Raylib.DrawFPS(10, 10); //Draws the FPS counter
+                Raylib.DrawText("Cycles per Frame: " + CycleManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
                 Emulator.MainLoop();
                 Raylib.EndDrawing();
             }

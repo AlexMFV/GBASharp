@@ -13,6 +13,10 @@ namespace GBASharp
         public static byte[] memory = new byte[0xFFFF]; //64KiB Memory
         public static byte[] bootROM = new byte[0xFF]; //256b boot ROM
 
+        //Cycles
+        static double cycles = 0; //Max: 68,470 cycles per frame
+        static bool canProcess = true;
+
         //Registers
         public static byte reg_a = 0x0; //Accumulator & Flags
 
@@ -42,6 +46,9 @@ namespace GBASharp
         public static byte op_X = 0x0;
         public static byte op_Y = 0x0;
         public static byte op_N = 0x0;
+
+        public static bool CanProcess { get { return canProcess; } set { canProcess = value; } }
+        public static double Cycles { get { return cycles; } set { cycles = value; } }
 
         public static ushort BC_Register { get { return reg_bc; } set { reg_bc = value; } }
         public static byte B_Register { get { return (byte)(reg_bc >> 8 & 0xff); } set { reg_bc = (ushort)(value << 8 | reg_bc & 0xff); } }
@@ -477,10 +484,22 @@ namespace GBASharp
                 default: break;
             }
 
+            IncrementCycleCounter(opcode);
             pc += 0x1;
         }
 
         #endregion
+
+        public static void ResetCycleCounter() { cycles = 0; canProcess = true; }
+
+        public static void IncrementCycleCounter(byte opcode)
+        {
+            cycles += CycleManager.CYCLES_OPCODE[opcode];
+
+            //Maybe try to find a way to make this more efficient, like a trigger (?)
+            if(canProcess && cycles >= CycleManager.MAX_CYCLES_FRAME)
+                canProcess = false; //Stops processing until the next frame
+        }
 
         public static ushort GetWordFromPC()
         {
@@ -540,7 +559,7 @@ namespace GBASharp
 
         public static void Execute()
         {
-
+            //ExecuteOpcode
         }
     }
 }
