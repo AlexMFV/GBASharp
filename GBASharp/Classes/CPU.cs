@@ -28,9 +28,9 @@ namespace GBASharp
         public static byte flag_h = 0x0;
         public static byte flag_c = 0x0;
 
-        static ushort reg_bc = 0x0; //BC
-        static ushort reg_de = 0x0; //DE
-        static ushort reg_hl = 0x0; //HL
+        public static ushort reg_bc = 0x0; //BC
+        public static ushort reg_de = 0x0; //DE
+        public static ushort reg_hl = 0x0; //HL
         public static ushort reg_sp = 0x0; //Stack Pointer
         public static ushort pc = 0x0;     //Program Counter
 

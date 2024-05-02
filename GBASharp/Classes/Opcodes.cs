@@ -10,20 +10,20 @@ namespace GBASharp
     {
         #region 0x
 
-        public static void Code0x00() { }
+        public static void Code0x00() { OpcodeHelpers.NOP(); }
         public static void Code0x01() { OpcodeHelpers.LDxBC(); }
         public static void Code0x02() { OpcodeHelpers.LDmBC(); }
-        public static void Code0x03() { }
-        public static void Code0x04() { }
-        public static void Code0x05() { }
+        public static void Code0x03() { OpcodeHelpers.INC(ref CPU.reg_bc); }
+        public static void Code0x04() { OpcodeHelpers.INCxB(); }
+        public static void Code0x05() { OpcodeHelpers.DECxB(); }
         public static void Code0x06() { }
         public static void Code0x07() { }
         public static void Code0x08() { }
-        public static void Code0x09() { }
+        public static void Code0x09() { OpcodeHelpers.ADDtoHL(CPU.BC_Register); }
         public static void Code0x0A() { }
         public static void Code0x0B() { }
-        public static void Code0x0C() { }
-        public static void Code0x0D() { }
+        public static void Code0x0C() { OpcodeHelpers.INCxC(); }
+        public static void Code0x0D() { OpcodeHelpers.DECxC(); }
         public static void Code0x0E() { }
         public static void Code0x0F() { }
 
@@ -34,17 +34,17 @@ namespace GBASharp
         public static void Code0x10() { }
         public static void Code0x11() { OpcodeHelpers.LDxDE(); }
         public static void Code0x12() { OpcodeHelpers.LDmDE(); }
-        public static void Code0x13() { }
-        public static void Code0x14() { }
-        public static void Code0x15() { }
+        public static void Code0x13() { OpcodeHelpers.INC(ref CPU.reg_de); }
+        public static void Code0x14() { OpcodeHelpers.INCxD(); }
+        public static void Code0x15() { OpcodeHelpers.DECxD();}
         public static void Code0x16() { }
         public static void Code0x17() { }
         public static void Code0x18() { }
-        public static void Code0x19() { }
+        public static void Code0x19() { OpcodeHelpers.ADDtoHL(CPU.DE_Register); }
         public static void Code0x1A() { }
         public static void Code0x1B() { }
-        public static void Code0x1C() { }
-        public static void Code0x1D() { }
+        public static void Code0x1C() { OpcodeHelpers.INCxE(); }
+        public static void Code0x1D() { OpcodeHelpers.DECxE();}
         public static void Code0x1E() { }
         public static void Code0x1F() { }
 
@@ -55,17 +55,17 @@ namespace GBASharp
         public static void Code0x20() { }
         public static void Code0x21() { OpcodeHelpers.LDxHL(); }
         public static void Code0x22() { OpcodeHelpers.LDmHLI(); }
-        public static void Code0x23() { }
-        public static void Code0x24() { }
-        public static void Code0x25() { }
+        public static void Code0x23() { OpcodeHelpers.INC(ref CPU.reg_hl); }
+        public static void Code0x24() { OpcodeHelpers.INCxH(); }
+        public static void Code0x25() { OpcodeHelpers.DECxH();}
         public static void Code0x26() { }
         public static void Code0x27() { }
         public static void Code0x28() { }
-        public static void Code0x29() { }
+        public static void Code0x29() { OpcodeHelpers.ADDtoHL(CPU.HL_Register); }
         public static void Code0x2A() { }
         public static void Code0x2B() { }
-        public static void Code0x2C() { }
-        public static void Code0x2D() { }
+        public static void Code0x2C() { OpcodeHelpers.INCxL(); }
+        public static void Code0x2D() { OpcodeHelpers.DECxL();}
         public static void Code0x2E() { }
         public static void Code0x2F() { }
 
@@ -76,17 +76,17 @@ namespace GBASharp
         public static void Code0x30() { }
         public static void Code0x31() { OpcodeHelpers.LDxSP(); }
         public static void Code0x32() { OpcodeHelpers.LDmHLD(); }
-        public static void Code0x33() { }
-        public static void Code0x34() { }
-        public static void Code0x35() { }
+        public static void Code0x33() { OpcodeHelpers.INC(ref CPU.reg_sp); }
+        public static void Code0x34() { OpcodeHelpers.INCxHL(); }
+        public static void Code0x35() { OpcodeHelpers.DECxHL();}
         public static void Code0x36() { }
         public static void Code0x37() { }
         public static void Code0x38() { }
-        public static void Code0x39() { }
+        public static void Code0x39() { OpcodeHelpers.ADDtoHL(CPU.reg_sp); }
         public static void Code0x3A() { }
         public static void Code0x3B() { }
-        public static void Code0x3C() { }
-        public static void Code0x3D() { }
+        public static void Code0x3C() { OpcodeHelpers.INCxA(); }
+        public static void Code0x3D() { OpcodeHelpers.DECxA();}
         public static void Code0x3E() { }
         public static void Code0x3F() { }
 
@@ -350,8 +350,11 @@ namespace GBASharp
         public static void SetFlagZ(ushort sum) { CPU.flag_z = (byte)sum == 0x0 ? (byte)0x1 : (byte)0x0; }
         public static void SetFlagN(bool result) { CPU.flag_n = result ? (byte)0x1 : (byte)0x0; }
         public static void SetFlagH(byte value) { CPU.flag_h = (byte)(value > 0xf ? 0x1 : 0x0); }
+        public static void SetFlagH(ushort value) { CPU.flag_h = (byte)(value > 0xfff ? 0x1 : 0x0); }
         public static void SetFlagH(bool result) { CPU.flag_h = (byte)(result ? 0x1 : 0x0); }
         public static void SetFlagC(bool result) { CPU.flag_c = result ? (byte)0x1 : (byte)0x0; }
+
+        public static void NOP() { /* No Operation */ }
 
         public static void ADC(byte reg)
         {
@@ -399,6 +402,17 @@ namespace GBASharp
             SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
 
             CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void ADDtoHL(ushort reg)
+        {
+            int sum = (int)(CPU.HL_Register + reg);
+
+            SetFlagN(false);
+            SetFlagH((ushort)((CPU.HL_Register & 0xfff) + (reg & 0xfff))); //Overflow from bit 11
+            SetFlagC(sum > 0xffff); //Overflow from 15 bit (whole value)
+
+            CPU.HL_Register = (ushort)(sum);
         }
 
         public static void SBC(byte reg)
@@ -588,5 +602,135 @@ namespace GBASharp
         public static void LDmHLD() { CPU.memory[CPU.HL_Register] = CPU.reg_a; CPU.HL_Register -= 0x1; } //Decrement
 
         public static void LDmSP() { CPU.memory[CPU.reg_sp] = CPU.reg_a; }
+
+        public static void INC(ref ushort reg) { reg += 0x1; }
+
+        public static void INCxB()
+        {
+            CPU.B_Register += 0x1;
+            SetFlagZ(CPU.B_Register);
+            SetFlagN(false);
+            SetFlagH((CPU.B_Register & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxD()
+        {
+            CPU.D_Register += 0x1;
+            SetFlagZ(CPU.D_Register);
+            SetFlagN(false);
+            SetFlagH((CPU.D_Register & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxH()
+        {
+            CPU.H_Register += 0x1;
+            SetFlagZ(CPU.H_Register);
+            SetFlagN(false);
+            SetFlagH((CPU.H_Register & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxHL()
+        {
+            CPU.memory[CPU.HL_Register] += 0x1;
+            SetFlagZ(CPU.memory[CPU.HL_Register]);
+            SetFlagN(false);
+            SetFlagH((CPU.memory[CPU.HL_Register] & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxC()
+        {
+            CPU.C_Register += 0x1;
+            SetFlagZ(CPU.C_Register);
+            SetFlagN(false);
+            SetFlagH((CPU.C_Register & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxE()
+        {
+            CPU.E_Register += 0x1;
+            SetFlagZ(CPU.E_Register);
+            SetFlagN(false);
+            SetFlagH((CPU.E_Register & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxL()
+        {
+            CPU.L_Register += 0x1;
+            SetFlagZ(CPU.L_Register);
+            SetFlagN(false);
+            SetFlagH((CPU.L_Register & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void INCxA()
+        {
+            CPU.reg_a += 0x1;
+            SetFlagZ(CPU.reg_a);
+            SetFlagN(false);
+            SetFlagH((CPU.reg_a & 0xf) == 0x0); //Set if overflow from bit 3)
+        }
+
+        public static void DECxB()
+        {
+            CPU.B_Register -= 0x1;
+            SetFlagZ(CPU.B_Register);
+            SetFlagN(true);
+            SetFlagH((CPU.B_Register & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxD()
+        {
+            CPU.D_Register -= 0x1;
+            SetFlagZ(CPU.D_Register);
+            SetFlagN(true);
+            SetFlagH((CPU.D_Register & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxH()
+        {
+            CPU.H_Register -= 0x1;
+            SetFlagZ(CPU.H_Register);
+            SetFlagN(true);
+            SetFlagH((CPU.H_Register & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxHL()
+        {
+            CPU.memory[CPU.HL_Register] -= 0x1;
+            SetFlagZ(CPU.memory[CPU.HL_Register]);
+            SetFlagN(true);
+            SetFlagH((CPU.memory[CPU.HL_Register] & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxC()
+        {
+            CPU.C_Register -= 0x1;
+            SetFlagZ(CPU.C_Register);
+            SetFlagN(true);
+            SetFlagH((CPU.C_Register & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxE()
+        {
+            CPU.E_Register -= 0x1;
+            SetFlagZ(CPU.E_Register);
+            SetFlagN(true);
+            SetFlagH((CPU.E_Register & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxL()
+        {
+            CPU.L_Register -= 0x1;
+            SetFlagZ(CPU.L_Register);
+            SetFlagN(true);
+            SetFlagH((CPU.L_Register & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
+
+        public static void DECxA()
+        {
+            CPU.reg_a -= 0x1;
+            SetFlagZ(CPU.reg_a);
+            SetFlagN(true);
+            SetFlagH((CPU.reg_a & 0xf) == 0xf); //Set if borrow from bit 4)
+        }
     }
 }
