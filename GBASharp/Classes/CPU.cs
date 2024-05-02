@@ -11,6 +11,7 @@ namespace GBASharp
     {
         //CPU Memory Map
         public static byte[] memory = new byte[0xFFFF]; //64KiB Memory
+        public static byte[] bootROM = new byte[0xFF]; //256b boot ROM
 
         //Registers
         public static byte reg_a = 0x0; //Accumulator & Flags
@@ -497,8 +498,9 @@ namespace GBASharp
 
         public static void BootSequence()
         {
-            //Clear and Load Rom
+            //Clear and Load ROMs
             ClearMemory();
+            LoadBootROM();
             LoadRomToMemory();
         }
 
@@ -506,6 +508,13 @@ namespace GBASharp
         {
             for (int i = 0; i < memory.Length; i++)
                 memory[i] = 0x0;
+        }
+
+        static void LoadBootROM()
+        {
+            //The boot rom only loads the first 256 bytes
+            for (int i = 0x0; i <= 0xFF; i++)
+                memory[i] = bootROM[i];
         }
 
         static void LoadRomToMemory()

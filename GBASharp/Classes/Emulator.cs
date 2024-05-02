@@ -6,6 +6,7 @@ namespace GBASharp
     {
         public static void Setup()
         {
+            RomLoader.LoadBootRom("dmg_boot.bin");
             RomLoader.LoadRom("tetris.gb");
             CPU.BootSequence();
         }
