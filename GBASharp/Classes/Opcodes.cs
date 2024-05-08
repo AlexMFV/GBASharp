@@ -8,7 +8,7 @@ namespace GBASharp
 {
     public static class Opcodes
     {
-        #region 0x
+        #region 0x (0x08 not implemented)
 
         public static void Code0x00() { OpcodeHelpers.NOP(); }
         public static void Code0x01() { OpcodeHelpers.LDxBC(); }
@@ -29,7 +29,7 @@ namespace GBASharp
 
         #endregion
 
-        #region 1x
+        #region 1x (Done)
 
         public static void Code0x10() { OpcodeHelpers.STOP(); }
         public static void Code0x11() { OpcodeHelpers.LDxDE(); }
@@ -39,7 +39,7 @@ namespace GBASharp
         public static void Code0x15() { OpcodeHelpers.DECxD();}
         public static void Code0x16() { OpcodeHelpers.LDxD(CPU.GetByteFromPC()); }
         public static void Code0x17() { OpcodeHelpers.RLA(); }
-        public static void Code0x18() { }
+        public static void Code0x18() { OpcodeHelpers.JR(); }
         public static void Code0x19() { OpcodeHelpers.ADDtoHL(CPU.DE_Register); }
         public static void Code0x1A() { OpcodeHelpers.LDxA(CPU.DE_Register); }
         public static void Code0x1B() { OpcodeHelpers.DECxDE(); }
@@ -50,7 +50,7 @@ namespace GBASharp
 
         #endregion
 
-        #region 2x
+        #region 2x (0x27 not implemented)
 
         public static void Code0x20() { OpcodeHelpers.JR(CPU.flag_z, false); }
         public static void Code0x21() { OpcodeHelpers.LDxHL(); }
@@ -59,36 +59,36 @@ namespace GBASharp
         public static void Code0x24() { OpcodeHelpers.INCxH(); }
         public static void Code0x25() { OpcodeHelpers.DECxH();}
         public static void Code0x26() { OpcodeHelpers.LDxH(CPU.GetByteFromPC()); }
-        public static void Code0x27() { }
-        public static void Code0x28() { }
+        public static void Code0x27() { OpcodeHelpers.DAA(); }
+        public static void Code0x28() { OpcodeHelpers.JR(CPU.flag_z, true); }
         public static void Code0x29() { OpcodeHelpers.ADDtoHL(CPU.HL_Register); }
         public static void Code0x2A() { OpcodeHelpers.LDxA(CPU.HL_Register); CPU.HL_Register += 0x1; }
         public static void Code0x2B() { OpcodeHelpers.DECxHL(); }
         public static void Code0x2C() { OpcodeHelpers.INCxL(); }
         public static void Code0x2D() { OpcodeHelpers.DECxL();}
         public static void Code0x2E() { OpcodeHelpers.LDxL(CPU.GetByteFromPC()); }
-        public static void Code0x2F() { }
+        public static void Code0x2F() { OpcodeHelpers.CPL(); }
 
         #endregion
 
-        #region 3x
+        #region 3x (Done)
 
-        public static void Code0x30() { }
+        public static void Code0x30() { OpcodeHelpers.JR(CPU.flag_c, false); }
         public static void Code0x31() { OpcodeHelpers.LDxSP(); }
         public static void Code0x32() { OpcodeHelpers.LDmHLD(); }
         public static void Code0x33() { OpcodeHelpers.INC(ref CPU.reg_sp); }
         public static void Code0x34() { OpcodeHelpers.INCxHL(); }
         public static void Code0x35() { OpcodeHelpers.DECmHL();}
         public static void Code0x36() { OpcodeHelpers.LDxHL(CPU.GetByteFromPC()); }
-        public static void Code0x37() { }
-        public static void Code0x38() { }
+        public static void Code0x37() { OpcodeHelpers.SCF(); }
+        public static void Code0x38() { OpcodeHelpers.JR(CPU.flag_c, true); }
         public static void Code0x39() { OpcodeHelpers.ADDtoHL(CPU.reg_sp); }
         public static void Code0x3A() { OpcodeHelpers.LDxA(CPU.HL_Register); CPU.HL_Register -= 0x1; }
         public static void Code0x3B() { OpcodeHelpers.DECxSP(); }
         public static void Code0x3C() { OpcodeHelpers.INCxA(); }
         public static void Code0x3D() { OpcodeHelpers.DECxA();}
         public static void Code0x3E() { OpcodeHelpers.LDxA(CPU.GetByteFromPC()); }
-        public static void Code0x3F() { }
+        public static void Code0x3F() { OpcodeHelpers.CCF(); }
 
         #endregion
 
@@ -354,6 +354,7 @@ namespace GBASharp
         public static void SetFlagH(ushort value) { CPU.flag_h = (byte)(value > 0xfff ? 0x1 : 0x0); }
         public static void SetFlagH(bool result) { CPU.flag_h = (byte)(result ? 0x1 : 0x0); }
         public static void SetFlagC(bool result) { CPU.flag_c = result ? (byte)0x1 : (byte)0x0; }
+        public static void InvertFlagC() { CPU.flag_c = CPU.flag_c == 0x1 ? (byte)0x0 : (byte)0x1; }
 
         public static void NOP() { /* No Operation */ }
         
@@ -806,19 +807,47 @@ namespace GBASharp
             return (byte)(flag << 7 | reg >> 1);
         }
 
-        public static void JR(byte flag, bool expect = false)
+        public static void JR() { JR(0x0, ignore: true); }
+
+        public static void JR(byte flag, bool expect = false, bool ignore = false)
         {
-            if (flag == (expect ? 0x1 : 0x0))
+            byte immediate = CPU.GetByteFromPC();
+            if (ignore || flag == (expect ? 0x1 : 0x0))
             {
-                byte immediate = CPU.GetByteFromPC();
-                bool minus = immediate < 0x80; //If less than 128
+                bool minus = immediate >= 0x80; //If less than 128
 
                 //Should return a value from -128 to 127 (255)
                 if (minus)
-                    CPU.pc -= (byte)(0x80 - immediate);
+                    CPU.pc -= (byte)(0x80 - (immediate - 0x80));
                 else
-                    CPU.pc += (byte)(immediate - 0x80);
+                    CPU.pc += (byte)(immediate);
             }
+        }
+
+        public static void DAA()
+        {
+
+        }
+
+        public static void SCF()
+        {
+            SetFlagH(false);
+            SetFlagN(false);
+            SetFlagC(true);
+        }
+
+        public static void CPL()
+        {
+            CPU.reg_a = (byte)~CPU.reg_a;
+            SetFlagN(true);
+            SetFlagH(true);
+        }
+
+        public static void CCF()
+        {
+            SetFlagH(false);
+            SetFlagN(false);
+            InvertFlagC();
         }
     }
 }
