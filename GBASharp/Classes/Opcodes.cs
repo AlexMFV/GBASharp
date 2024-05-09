@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -306,15 +307,15 @@ namespace GBASharp
 
         public static void Code0xE0() { }
         public static void Code0xE1() { }
-        public static void Code0xE2() { }
+        public static void Code0xE2() { OpcodeHelpers.LDIO(CPU.C_Register, CPU.reg_a); }
         public static void Code0xE3() { }
         public static void Code0xE4() { }
         public static void Code0xE5() { }
         public static void Code0xE6() { }
         public static void Code0xE7() { }
-        public static void Code0xE8() { }
+        public static void Code0xE8() { OpcodeHelpers.ADDSP(); }
         public static void Code0xE9() { }
-        public static void Code0xEA() { }
+        public static void Code0xEA() { OpcodeHelpers.LD(CPU.GetWordFromPC(), CPU.reg_a); }
         public static void Code0xEB() { }
         public static void Code0xEC() { }
         public static void Code0xED() { }
@@ -327,7 +328,7 @@ namespace GBASharp
 
         public static void Code0xF0() { }
         public static void Code0xF1() { }
-        public static void Code0xF2() { }
+        public static void Code0xF2() { OpcodeHelpers.LDIOxA(CPU.C_Register); }
         public static void Code0xF3() { }
         public static void Code0xF4() { }
         public static void Code0xF5() { }
@@ -335,7 +336,7 @@ namespace GBASharp
         public static void Code0xF7() { }
         public static void Code0xF8() { }
         public static void Code0xF9() { }
-        public static void Code0xFA() { }
+        public static void Code0xFA() { OpcodeHelpers.LDxA(CPU.memory[CPU.GetWordFromPC()]); }
         public static void Code0xFB() { }
         public static void Code0xFC() { }
         public static void Code0xFD() { }
@@ -394,6 +395,35 @@ namespace GBASharp
             SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
 
             CPU.reg_a = (byte)(sum & 0xff);
+        }
+
+        public static void ADDSP()
+        {
+            byte immediate = CPU.GetByteFromPC();
+            bool minus = immediate >= 0x80; //If less than 128
+
+            ushort sum = 0x0;
+            
+            if(minus)
+                sum = (ushort)(CPU.reg_sp - immediate);
+            else
+                sum = (ushort)(CPU.reg_sp + immediate);
+
+            SetFlagZ(false);
+            SetFlagN(false);
+
+            if(minus)
+                SetFlagH((byte)((CPU.reg_sp & 0xf) - (immediate & 0xf))); //Overflow from bit 3
+            else
+                SetFlagH((byte)((CPU.reg_sp & 0xf) + (immediate & 0xf))); //Overflow from bit 3
+
+            SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
+
+            //Should return a value from -128 to 127 (255)
+            if (minus)
+                CPU.reg_sp -= (byte)(0x80 - (immediate - 0x80) & 0xFF);
+            else
+                CPU.reg_sp += (byte)(immediate & 0xFF);
         }
 
         public static void ADDHL(ushort reg)
@@ -559,6 +589,12 @@ namespace GBASharp
             SetFlagC(CPU.memory[reg] > CPU.reg_a); //Set if overflow from 7 bit
         }
         
+        public static void LD(ushort address, byte value) { CPU.memory[address] = value; }
+        
+        public static void LDIO(byte address, byte value) { CPU.memory[0xFF00 + address] = value; }
+        
+        public static void LDIOxA(byte address) { CPU.reg_a = CPU.memory[0xFF00 + address]; }
+
         public static void LDxA(byte value) { CPU.reg_a = value; }
 
         public static void LDxA(ushort value) { CPU.reg_a = CPU.memory[value]; }
