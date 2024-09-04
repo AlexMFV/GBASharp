@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Toolkit.HighPerformance;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -397,33 +398,61 @@ namespace GBASharp
             CPU.reg_a = (byte)(sum & 0xff);
         }
 
-        public static void ADDSP()
+        /*public static void ADDSP()
         {
             byte immediate = CPU.GetByteFromPC();
-            bool minus = immediate >= 0x80; //If less than 128
+            sbyte signed = (sbyte)(immediate - 0x80);
 
-            ushort sum = 0x0;
-            
-            if(minus)
-                sum = (ushort)(CPU.reg_sp - immediate);
-            else
-                sum = (ushort)(CPU.reg_sp + immediate);
+            ushort sum = (0x0);
+
+            sum = (ushort)(CPU.reg_sp + signed);
+
+            //if(signed < 0x0)
+            //    sum = (ushort)(CPU.reg_sp + immediate);
+            //else
+            //    sum = (ushort)(CPU.reg_sp - (immediate - 0x80));
 
             SetFlagZ(false);
             SetFlagN(false);
 
-            if(minus)
-                SetFlagH((byte)((CPU.reg_sp & 0xf) - (immediate & 0xf))); //Overflow from bit 3
-            else
-                SetFlagH((byte)((CPU.reg_sp & 0xf) + (immediate & 0xf))); //Overflow from bit 3
+            SetFlagH((byte)((CPU.reg_sp & 0xf) + (signed & 0xf)));  //Overflow from bit 3
+
+            //if(signed < 0x0)
+            //    SetFlagH((byte)((CPU.reg_sp & 0xf) - (immediate & 0xf))); //Overflow from bit 3
+            //else
+            //    SetFlagH((byte)((CPU.reg_sp & 0xf) + (immediate & 0xf))); //Overflow from bit 3
 
             SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
 
+            //if(signed < 0x0)
+            //    SetFlagC(immediate > 0xff); //Overflow from 7 bit (whole value)
+            //else
+            //    SetFlagC((immediate - 0x80) > 0xff); //Overflow from 7 bit (whole value)
+
+            CPU.reg_sp += (byte)(signed & 0xFF);
+
             //Should return a value from -128 to 127 (255)
-            if (minus)
-                CPU.reg_sp -= (byte)(0x80 - (immediate - 0x80) & 0xFF);
+            //if (signed < 0x0)
+            //    CPU.reg_sp += (byte)(immediate & 0xFF);
+            //else
+            //    CPU.reg_sp -= (byte)((immediate - 0x80) & 0xFF);
+        }*/
+
+        public static void ADDSP()
+        {
+            byte reg = CPU.GetByteFromPC();
+            ushort sum = (ushort)((CPU.reg_sp & 0xff) + (reg > 0x80 ? (reg - 0x80) : reg));
+
+            SetFlagZ(false);
+            SetFlagN(false);
+            SetFlagH((byte)((CPU.reg_sp & 0xf) + (reg & 0xf))); //Overflow from bit 3
+            SetFlagC(sum > 0xff);   //Overflow from bit 7
+
+            if(reg > 0x80)
+                CPU.reg_sp -= (byte)(reg - 0x80);
             else
-                CPU.reg_sp += (byte)(immediate & 0xFF);
+                CPU.reg_sp += reg;
+
         }
 
         public static void ADDHL(ushort reg)
