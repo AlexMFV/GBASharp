@@ -383,8 +383,8 @@ namespace OpcodeTests
 
         #region Ex
 
-        [TestMethod] public void Test0xE0() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xE1() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xE0() { TestOpcode(0xE0, LoadTests("E0")); }
+        [TestMethod] public void Test0xE1() { TestOpcode(0xE1, LoadTests("E1")); }
         [TestMethod] public void Test0xE2() { TestOpcode(0xE2, LoadTests("E2")); }
         [TestMethod] public void Test0xE3() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xE4() { Assert.Inconclusive(); }
@@ -404,7 +404,7 @@ namespace OpcodeTests
 
         #region Fx
 
-        [TestMethod] public void Test0xF0() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xF0() { TestOpcode(0xF0, LoadTests("F0")); }
         [TestMethod] public void Test0xF1() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xF2() { TestOpcode(0xF2, LoadTests("F2")); }
         [TestMethod] public void Test0xF3() { Assert.Inconclusive(); }

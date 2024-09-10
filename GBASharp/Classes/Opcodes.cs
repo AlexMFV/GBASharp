@@ -306,8 +306,8 @@ namespace GBASharp
 
         #region Ex
 
-        public static void Code0xE0() { }
-        public static void Code0xE1() { }
+        public static void Code0xE0() { OpcodeHelpers.LDIO(CPU.GetByteFromPC(), CPU.reg_a); }
+        public static void Code0xE1() { OpcodeHelpers.POPxHL(); }
         public static void Code0xE2() { OpcodeHelpers.LDIO(CPU.C_Register, CPU.reg_a); }
         public static void Code0xE3() { }
         public static void Code0xE4() { }
@@ -327,7 +327,7 @@ namespace GBASharp
 
         #region Fx
 
-        public static void Code0xF0() { }
+        public static void Code0xF0() { OpcodeHelpers.LDxA(CPU.memory[0xff00 + CPU.GetByteFromPC()]); }
         public static void Code0xF1() { }
         public static void Code0xF2() { OpcodeHelpers.LDIOxA(CPU.C_Register); }
         public static void Code0xF3() { }
@@ -620,9 +620,9 @@ namespace GBASharp
         
         public static void LD(ushort address, byte value) { CPU.memory[address] = value; }
         
-        public static void LDIO(byte address, byte value) { CPU.memory[0xFF00 + address] = value; }
+        public static void LDIO(byte address, byte value) { CPU.memory[0xff00 + address] = value; }
         
-        public static void LDIOxA(byte address) { CPU.reg_a = CPU.memory[0xFF00 + address]; }
+        public static void LDIOxA(byte address) { CPU.reg_a = CPU.memory[0xff00 + address]; }
 
         public static void LDxA(byte value) { CPU.reg_a = value; }
 
@@ -671,6 +671,8 @@ namespace GBASharp
         public static void LDmHLD() { CPU.memory[CPU.HL_Register] = CPU.reg_a; CPU.HL_Register -= 0x1; } //Decrement
 
         public static void LDmSP() { CPU.memory[CPU.reg_sp] = CPU.reg_a; }
+
+        public static void LDH() {  }
 
         public static void INC(ref ushort reg) { reg += 0x1; }
 
@@ -914,5 +916,17 @@ namespace GBASharp
             SetFlagN(false);
             InvertFlagC();
         }
+
+        public static void POPxHL()
+        {
+            CPU.HL_Register = (ushort)(CPU.memory[CPU.reg_sp] & 0xff00 + CPU.memory[CPU.reg_sp] & 0xff);
+            CPU.reg_sp += 0x2;
+        }
+        
+        public static void POPxAF() {  }
+
+        public static void PUSH(ushort register) { }
+
+        public static void PUSHxAF() { }
     }
 }
