@@ -46,7 +46,7 @@
 
         public static void ProcessScanline()
         {
-            if()
+
         }
     }
 }
