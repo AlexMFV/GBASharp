@@ -1,17 +1,24 @@
 ﻿using Raylib_CsLo;
+using System.Timers;
 
 namespace GBASharp
 {
     public static class Emulator
     {
+        public static CycleManager cpuManager;
+        public static CycleManager ppuManager;
+
         public static void Setup()
         {
             RomLoader.LoadBootRom("dmg_boot.bin");
             RomLoader.LoadRom("tetris.gb");
             CPU.BootSequence();
             PPU.InitRegisters();
-            CycleManager.SetupTimer();
-            CycleManager.Start();
+            cpuManager = new CycleManager(CPU.ResetCycleCounter);
+            ppuManager = new CycleManager(PPU.ResetCycleCounter);
+
+            cpuManager.Start();
+            ppuManager.Start();
         }
 
         public static void MainLoop()
@@ -28,29 +35,52 @@ namespace GBASharp
             //Once the timer elapses we reset the counter, so that the opcode processing can continue
             //PS: The screen will continue to update at 60 fps
             //Another Note: We can have an array containing the number of cycles each opcode takes, so that we can easily access it after the Opcode Switch
+            
+            Random rand = new Random();
+            double totalCycles = 70224;
+            double currCycle = 0;
+            double cpuCycles = 0;
 
-            while (CPU.CanProcess && !Raylib.WindowShouldClose())
+            while (!Raylib.WindowShouldClose())
             {
-                Raylib.BeginDrawing();
-                Raylib.ClearBackground(Raylib.BLACK);
-                Raylib.DrawFPS(10, 10); //Draws the FPS counter
-                Raylib.DrawText("Cycles per Frame: " + CycleManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
+                currCycle = 0;
 
-                for (int i = 0; i < 20; i++)
+                while (currCycle < totalCycles) //cpuManager.canProcess || ppuManager.canProcess
                 {
-                    for(int j = 0; j < 20; j++)
-                    {
-                        Raylib.DrawPixel(i, j, new Color(255, 0, 0, 255));
-                    }
+                    //Process opcodes for the duration of one frame
+                    CPU.Fetch();
+                    CPU.Decode();
+                    CPU.Execute();
+
+                    cpuCycles = CycleManager.CYCLES_OPCODE[CPU.opcode]; //Cycles used for the execution of the current instruction
+                    currCycle += cpuCycles; //Total number of cycles
+
+                    //cpuManager.UpdateCycles(CycleManager.CYCLES_OPCODE[CPU.opcode]);
+                    //ppuManager.UpdateCycles(cpuManager);
+
+                    PPU.Process(cpuCycles);
+
+                    //int valor = rand.Next(0, 5);
+                    //switch(valor)
+                    //{
+                    //    case 0: Screen.FillScreen(new Color(255, 0, 0, 255)); break;
+                    //    case 1: Screen.FillScreen(new Color(0, 255, 0, 255)); break;
+                    //    case 2: Screen.FillScreen(new Color(0, 0, 255, 255)); break;
+                    //    case 3: Screen.FillScreen(new Color(255, 0, 255, 255)); break;
+                    //    case 4: Screen.FillScreen(new Color(0, 255, 255, 255)); break;
+                    //}
                 }
 
-                CPU.Fetch();
-                CPU.Decode();
-                CPU.Execute();
+                //Update the screen
+                Raylib.BeginDrawing();
+                Raylib.ClearBackground(Raylib.WHITE);
+                Raylib.DrawFPS(10, 10); //Draws the FPS counter
+                Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
+                Raylib.DrawText("Can Process: " + cpuManager.canProcess, 10, 70, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
 
+                //Screen.Render();
                 Raylib.EndDrawing();
             }
-
         }
     }
 }

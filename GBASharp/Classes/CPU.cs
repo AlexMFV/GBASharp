@@ -13,10 +13,6 @@ namespace GBASharp
         public static byte[] memory = new byte[0xFFFF]; //64KiB Memory
         public static byte[] bootROM = new byte[0xFF]; //256b boot ROM
 
-        //Cycles
-        static double cycles = 0; //Max: 68,470 cycles per frame
-        static bool canProcess = true;
-
         //Registers
         public static byte reg_a = 0x0; //Accumulator & Flags
 
@@ -39,7 +35,7 @@ namespace GBASharp
         public static ushort reg_sp = 0x0; //Stack Pointer
         public static ushort pc = 0x0;     //Program Counter
 
-        public static ushort opcode = 0x0;
+        public static byte opcode = 0x0;
 
         //Helpers opcode (DXY0)
         public static byte op_Prefix = 0x0;
@@ -47,8 +43,8 @@ namespace GBASharp
         public static byte op_Y = 0x0;
         public static byte op_N = 0x0;
 
-        public static bool CanProcess { get { return canProcess; } set { canProcess = value; } }
-        public static double Cycles { get { return cycles; } set { cycles = value; } }
+        //public static bool CanProcess { get { return canProcess; } set { canProcess = value; } }
+        //public static double Cycles { get { return cycles; } set { cycles = value; } }
 
         public static ushort BC_Register { get { return reg_bc; } set { reg_bc = value; } }
         public static byte B_Register { get { return (byte)(reg_bc >> 8 & 0xff); } set { reg_bc = (ushort)(value << 8 | reg_bc & 0xff); } }
@@ -484,22 +480,33 @@ namespace GBASharp
                 default: break;
             }
 
-            IncrementCycleCounter(opcode);
             pc += 0x1;
         }
 
         #endregion
 
-        public static void ResetCycleCounter() { cycles = 0; canProcess = true; }
+        public static void ResetCycleCounter() { Emulator.cpuManager.cycle = 0; Emulator.cpuManager.canProcess = true; }
 
-        public static void IncrementCycleCounter(byte opcode)
-        {
-            cycles += CycleManager.CYCLES_OPCODE[opcode];
+        //public static void IncrementCycleCounter(byte opcode)
+        //{
+            
+            //cycles += CycleManager.CYCLES_OPCODE[opcode];
 
-            //Maybe try to find a way to make this more efficient, like a trigger (?)
-            if(canProcess && cycles >= CycleManager.MAX_CYCLES_FRAME)
-                canProcess = false; //Stops processing until the next frame
-        }
+            //THERE WILL PROBABLY BE A PROBLEM HERE.
+            //LET'S SAY FOR EXAMPLE THAT WE ARE RUNNING CORRECTLY AND THE PROCESSING OF OPCODES IS ALWAYS FASTER THAT THE FRAME TIME.
+            //THIS MEANS THAT EVERY FRAME THE OPCODE PROCESSING WILL ALWAYS WAIT SOME TIME BEFORE RESUMING THE NEXT OPCODES, BECAUSE
+            //IT USED ALL THE CYCLES FOR THAT FRAME BEFORE THE FRAME ENDED.
+
+            //BUT LET'S SAY THAT THE 70k+ CYCLES ARE NOT ATTAINABLE INSIDE A FRAME, THIS MEANS THAT SOME INSTRUCTIONS THAT SHOULD'VE BEEN 
+            //PROCESSED IN THAT FRAME WILL BE PASSED TO THE NEXT FRAME. BUT THE WAY OUR CODE IS DONE WE ONLY REFRESH THE SCREEN USING RAYLIB
+            //ONCE WE STOP THE OPCODE PROCESSING.
+
+            //AND SINCE IN THIS SCENARIO WE NEVER FINISH THE OPCODES FIRST, THE CPU.CanProcess VARIABLE IS ALWAYS TRUE, MEANING THE WHILE LOOP
+            //IS NEVER GOING TO STOP.
+
+            //MAYBE IF WE INCLUDE THE OPCODE CYCLE INSIDE THE RAYLIB.BEGINDRAWING AND ENDDRAWING WE CAN PROCESS NEW DATA INSIDE THE WHILE LOOP
+
+        //}
 
         public static ushort GetWordFromPC()
         {
@@ -538,15 +545,19 @@ namespace GBASharp
 
         static void LoadRomToMemory()
         {
+            //The rom should only be loaded after the boot rom is burned to memory (which is from 0x100 onward)
+
             //The rom itself only loads the first 32KiB
             for (int i = 0x0; i <= 0x7FFF; i++)
-                memory[pc + i] = Cartridge.ROM[i];
+                memory[0x100 + i] = Cartridge.ROM[i];
         }
 
         public static void Fetch()
         {
-            //opcode = (ushort)((memory[pc] << 0x8) | (memory[pc + 0x1]));
-            //pc += 0x1; //Jumps the program counter to the next instruction
+            if (pc >= memory.Length)
+                pc = 0xFFFF-0x1;
+
+            opcode = memory[pc];
         }
 
         public static void Decode()
@@ -560,6 +571,7 @@ namespace GBASharp
         public static void Execute()
         {
             //ExecuteOpcode
+            ExecuteOpcode(opcode);
         }
     }
 }

@@ -32,6 +32,15 @@ namespace GBASharp
         static byte[] win_framebuffer = new byte[256 * 256];
         //static byte[] sprite_framebuffer = new byte[256 * 256];
 
+        static double scanline_cycle = 0;
+        static double mode3_cycles = 0;
+        static bool endMode3 = false;
+        static double scanline = 0;
+        static double scanlineVBlank = 144;
+        static double max_scanlines = 154;
+
+        public static void ResetCycleCounter() { Emulator.ppuManager.cycle = 0; Emulator.ppuManager.canProcess = true; }
+
         public static void InitRegisters()
         {
             reg_LCDC = CPU.memory[add_LCDC];
@@ -44,5 +53,52 @@ namespace GBASharp
             reg_OBP0 = CPU.memory[add_OBP0];
             reg_OBP1 = CPU.memory[add_OBP1];
         }
+
+        public static void Process(double cpuCycles)
+        {
+            scanline_cycle += cpuCycles;
+
+            //Reached the end of the scanline (after HBlank)
+            if (scanline_cycle >= 456)
+            {
+                scanline_cycle = 0;
+                scanline++;
+
+                if (scanline_cycle > max_scanlines)
+                    scanline = 0;
+
+                return;
+            }
+
+            //VBlank Period, does nothing so we don't need this we can just skip
+            //if (scanline > 144 && scanline <= max_scanlines)
+            //    Mode1();
+
+            if (scanline_cycle <= 80)
+                Mode2();
+            else
+            {
+                if (mode3_cycles <= 289 && !endMode3)
+                {
+                    mode3_cycles += cpuCycles;
+                    //Need to add a endMode3 = true (if mode3 already processed all pixels before 289 cycles passed)
+                    Mode3(cpuCycles);
+                }
+            }
+        }
+
+        public static void Mode2()
+        {
+
+        }
+
+        public static void Mode3(double availableCycles)
+        {
+
+        }
+
+        public static void Mode0() { }
+
+        public static void Mode1() { }
     }
 }

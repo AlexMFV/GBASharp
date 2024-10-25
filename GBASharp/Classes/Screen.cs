@@ -1,4 +1,7 @@
-﻿namespace GBASharp
+﻿using Raylib_CsLo;
+using System.Drawing;
+
+namespace GBASharp
 {
     public static class Screen
     {
@@ -19,29 +22,31 @@
                 framebufferAlpha[i] = 0x0;
         }
 
-        public static void FillScreen(System.Drawing.Color color, bool background = true)
+        public static void FillScreen(Raylib_CsLo.Color color, bool background = true)
         {
-            for (int y = 0; y < Globals.SCREEN_HEIGHT; y++)
-            {
-                for (int x = 0; x < Globals.SCREEN_WIDTH; x++)
-                {
-                    if (background)
-                    {
-                        int idxRef = (y * Globals.SCREEN_HEIGHT + x) * 3;   //Calculate the pixel
-                        framebuffer[idxRef] = color.R;                      //Fill Red
-                        framebuffer[idxRef + 1] = color.G;                  //Fill green
-                        framebuffer[idxRef + 2] = color.B;                  //Fill Blue
-                    }
-                    else
-                    {
-                        int idxRef = (y * Globals.SCREEN_HEIGHT + x) * 4;   //Calculate the pixel
-                        framebufferAlpha[idxRef] = color.R;                 //Fill Red
-                        framebufferAlpha[idxRef + 1] = color.G;             //Fill green
-                        framebufferAlpha[idxRef + 2] = color.B;             //Fill Blue
-                        framebufferAlpha[idxRef + 3] = color.A;             //Fill Alpha
-                    }
-                }
-            }
+            Raylib.ClearBackground(color);
+
+            //for (int y = 0; y < Globals.SCREEN_HEIGHT; y++)
+            //{
+            //    for (int x = 0; x < Globals.SCREEN_WIDTH; x++)
+            //    {
+            //        if (background)
+            //        {
+            //            int idxRef = (y * Globals.SCREEN_HEIGHT + x) * 3;   //Calculate the pixel
+            //            framebuffer[idxRef] = color.R;                      //Fill Red
+            //            framebuffer[idxRef + 1] = color.G;                  //Fill green
+            //            framebuffer[idxRef + 2] = color.B;                  //Fill Blue
+            //        }
+            //        else
+            //        {
+            //            int idxRef = (y * Globals.SCREEN_HEIGHT + x) * 4;   //Calculate the pixel
+            //            framebufferAlpha[idxRef] = color.R;                 //Fill Red
+            //            framebufferAlpha[idxRef + 1] = color.G;             //Fill green
+            //            framebufferAlpha[idxRef + 2] = color.B;             //Fill Blue
+            //            framebufferAlpha[idxRef + 3] = color.A;             //Fill Alpha
+            //        }
+            //    }
+            //}
         }
 
         public static void ProcessScanline()

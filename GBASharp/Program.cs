@@ -14,7 +14,7 @@ namespace GBASharp
         static void InitializeEmulator()
         {
             //Initialize the window and main settings
-            Raylib.InitWindow(Globals.SCREEN_WIDTH, Globals.SCREEN_HEIGHT, "GBASharp");
+            Raylib.InitWindow(Globals.SCREEN_WIDTH * 3, Globals.SCREEN_HEIGHT * 3, "GBASharp");
             Raylib.SetTargetFPS(60);
             Emulator.Setup();
             
