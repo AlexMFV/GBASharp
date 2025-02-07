@@ -9,6 +9,9 @@ namespace GBASharp
         public static byte[] framebufferAlpha = new byte[Globals.SCREEN_WIDTH * Globals.SCREEN_HEIGHT * 4];    //Used for alpha screens (Window and Sprite screen)
         public static byte[] pixelBuffer = new byte[Globals.SCREEN_WIDTH * Globals.SCREEN_HEIGHT];
 
+        public static int pixelScaleX = Globals.REAL_SCREEN_WIDTH / Globals.SCREEN_WIDTH;
+        public static int pixelScaleY = Globals.REAL_SCREEN_HEIGHT / Globals.SCREEN_HEIGHT;
+
         private static int currentScanline = 0;
         private static int maxScanlines = 156; //Total number of scanlines
         private static int vblankIdx = 144; //From which scanline does the vBlank start
@@ -63,9 +66,37 @@ namespace GBASharp
             //}
         }
 
-        public static void ProcessScanline()
+        public static void Render()
         {
+            for (int pix = 0; pix < pixelBuffer.Length; pix++)
+            {
+                for (int scaledX = 0; scaledX < pixelScaleX; scaledX++)
+                {
+                    for (int scaledY = 0; scaledY < pixelScaleY; scaledY++)
+                    {
+                        int pixelX = (pix % Globals.SCREEN_WIDTH) * pixelScaleX + scaledX;
+                        int pixelY = (pix / Globals.SCREEN_WIDTH) * pixelScaleY + scaledY;
 
+                        //00 - transparent
+                        //01 - color 1
+                        //10 - color 2
+                        //11 - color 3
+                        switch (pixelBuffer[pix])
+                        {
+                            case 0x0: Raylib.DrawPixel(pixelX, pixelY, Raylib.BLACK); break;
+                            case 0x1: Raylib.DrawPixel(pixelX, pixelY, Raylib.RED); break;
+                            case 0x2: Raylib.DrawPixel(pixelX, pixelY, Raylib.GREEN); break;
+                            case 0x3: Raylib.DrawPixel(pixelX, pixelY, Raylib.BLUE); break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ProcessScanline(int scanline)
+        {
+            //for(int i = 0; i < 160; i++)
+            //    SetPixel(scanline, i, );
         }
     }
 }

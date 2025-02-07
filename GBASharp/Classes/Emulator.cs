@@ -35,7 +35,8 @@ namespace GBASharp
             //Once the timer elapses we reset the counter, so that the opcode processing can continue
             //PS: The screen will continue to update at 60 fps
             //Another Note: We can have an array containing the number of cycles each opcode takes, so that we can easily access it after the Opcode Switch
-            
+
+            Screen.InitScreen();
             Random rand = new Random();
             double totalCycles = 70224;
             double currCycle = 0;
@@ -75,10 +76,11 @@ namespace GBASharp
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Raylib.BLACK);
                 Raylib.DrawFPS(10, 10); //Draws the FPS counter
-                Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
-                Raylib.DrawText("Can Process: " + cpuManager.canProcess, 10, 70, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
+                //Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
+                //Raylib.DrawText("Can Process: " + cpuManager.canProcess, 10, 70, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
 
-                //Screen.Render();
+                Screen.Render();
+                //Screen.ProcessScanline(PPU.scanline);
                 Raylib.EndDrawing();
             }
         }

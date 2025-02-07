@@ -36,11 +36,11 @@ namespace GBASharp
         //static byte[] sprite_framebuffer = new byte[256 * 256];
 
         static double scanline_cycle = 0;
-        static double scanline_pixel = 0;
+        static int scanline_pixel = 0;
         static double mode3_cycles = 0;
         static bool endMode3 = false;
         static bool startMode3 = true;
-        static int scanline = 0;
+        public static int scanline = 0;
         static int scanlineVBlank = 144;
         static int max_scanlines = 154;
 
@@ -68,10 +68,12 @@ namespace GBASharp
             //Reached the end of the scanline (after HBlank)
             if (scanline_cycle >= 456)
             {
+                endMode3 = false;
+                startMode3 = true;
                 scanline_cycle = 0;
                 scanline++;
 
-                if (scanline_cycle > max_scanlines)
+                if (scanline >= scanlineVBlank) //scanline_cycle? Doesn't make sense
                     scanline = 0;
 
                 return;
@@ -91,11 +93,20 @@ namespace GBASharp
                     if(startMode3)
                     {
                         mode3_cycles = 0;
-                        scanlinePixel = 0;
+                        scanline_pixel = -1;
                         startMode3 = false;
                     }
 
                     mode3_cycles += cpuCycles;
+                    scanline_pixel++;
+
+                    //Processed all the pixels for the current scanline
+                    if (scanline_pixel >= 160)
+                    {
+                        endMode3 = true;
+                        return;
+                    }
+
                     //Need to add a endMode3 = true (if mode3 already processed all pixels before 289 cycles passed)
                     Mode3(cpuCycles);
                 }
@@ -138,7 +149,22 @@ namespace GBASharp
             //$8800-$8fff (block 0) and $9000-$97ff (block 1)
 
             int pixelY = scanline + (int)reg_SCY;
-            int pixelX = scanlinePixel + (int)reg_SCX;
+            int pixelX = scanline_pixel + (int)reg_SCX;
+
+            Random rand = new Random();
+            int pixel = rand.Next(0,4);
+
+            byte color = 0x0;
+
+            switch (pixel)
+            {
+                case 0: color = 0x0; break;
+                case 1: color = 0x1; break;
+                case 2: color = 0x2; break;
+                case 3: color = 0x3; break;
+            }
+
+            Screen.SetPixel(scanline, scanline_pixel, color);
         }
 
         public static void Mode0() { }
