@@ -61,9 +61,9 @@ namespace GBASharp
             reg_OBP1 = CPU.memory[add_OBP1];
         }
 
-        public static void Process(double cpuCycles)
+        private static void ProcessDot()
         {
-            scanline_cycle += cpuCycles;
+            scanline_cycle++; // += cpuCycles;
 
             //Reached the end of the scanline (after HBlank)
             if (scanline_cycle >= 456)
@@ -90,14 +90,14 @@ namespace GBASharp
                 if (mode3_cycles <= 289 && !endMode3)
                 {
                     //Runs only once it enters mode3, to reset all the counters
-                    if(startMode3)
+                    if (startMode3)
                     {
                         mode3_cycles = 0;
                         scanline_pixel = -1;
                         startMode3 = false;
                     }
 
-                    mode3_cycles += cpuCycles;
+                    mode3_cycles++;
                     scanline_pixel++;
 
                     //Processed all the pixels for the current scanline
@@ -108,9 +108,16 @@ namespace GBASharp
                     }
 
                     //Need to add a endMode3 = true (if mode3 already processed all pixels before 289 cycles passed)
-                    Mode3(cpuCycles);
+                    Mode3();
                 }
             }
+        }
+
+        public static void Process(double cpuCycles)
+        {
+            //Since the PPU runs at 4 times the speed of the CPU we need to run the PPU 4 times every CPU cycle
+            for (int dotCycle = 0; dotCycle < cpuCycles * 4; dotCycle++)
+                ProcessDot();
         }
 
         public static void Mode2()
@@ -139,7 +146,7 @@ namespace GBASharp
             }
         }
 
-        public static void Mode3(double availableCycles)
+        public static void Mode3()
         {
             //TODO: Check if LCDC has background enabled
 
