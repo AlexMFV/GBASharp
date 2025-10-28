@@ -166,7 +166,7 @@ namespace GBASharp
         public static void Code0x73() { OpcodeHelpers.LDxHL(CPU.E_Register); }
         public static void Code0x74() { OpcodeHelpers.LDxHL(CPU.H_Register); }
         public static void Code0x75() { OpcodeHelpers.LDxHL(CPU.L_Register); }
-        public static void Code0x76() { }
+        public static void Code0x76() { Console.Write("(Not Implemented)"); }
         public static void Code0x77() { OpcodeHelpers.LDxHL(CPU.reg_a); }
         public static void Code0x78() { OpcodeHelpers.LDxA(CPU.B_Register); }
         public static void Code0x79() { OpcodeHelpers.LDxA(CPU.C_Register); }
@@ -265,43 +265,43 @@ namespace GBASharp
 
         #region Cx
 
-        public static void Code0xC0() { }
-        public static void Code0xC1() { }
-        public static void Code0xC2() { }
-        public static void Code0xC3() { }
-        public static void Code0xC4() { }
-        public static void Code0xC5() { }
-        public static void Code0xC6() { }
-        public static void Code0xC7() { }
-        public static void Code0xC8() { }
-        public static void Code0xC9() { }
-        public static void Code0xCA() { }
-        public static void Code0xCB() { }
-        public static void Code0xCC() { }
-        public static void Code0xCD() { }
-        public static void Code0xCE() { }
-        public static void Code0xCF() { }
+        public static void Code0xC0() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC1() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC2() { OpcodeHelpers.JPxNZ(); }
+        public static void Code0xC3() { OpcodeHelpers.JP(); }
+        public static void Code0xC4() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC5() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC6() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC7() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC8() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC9() { OpcodeHelpers.RET(); }
+        public static void Code0xCA() { Console.Write("(Not Implemented)"); }
+        public static void Code0xCB() { OpcodeHelpers.PREFIX(); }
+        public static void Code0xCC() { Console.Write("(Not Implemented)"); }
+        public static void Code0xCD() { OpcodeHelpers.CALL(); }
+        public static void Code0xCE() { Console.Write("(Not Implemented)"); }
+        public static void Code0xCF() { Console.Write("(Not Implemented)"); }
 
         #endregion
 
         #region Dx
 
-        public static void Code0xD0() { }
-        public static void Code0xD1() { }
-        public static void Code0xD2() { }
-        public static void Code0xD3() { }
-        public static void Code0xD4() { }
-        public static void Code0xD5() { }
-        public static void Code0xD6() { }
-        public static void Code0xD7() { }
-        public static void Code0xD8() { }
-        public static void Code0xD9() { }
-        public static void Code0xDA() { }
-        public static void Code0xDB() { }
-        public static void Code0xDC() { }
-        public static void Code0xDD() { }
-        public static void Code0xDE() { }
-        public static void Code0xDF() { }
+        public static void Code0xD0() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD1() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD2() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD3() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD4() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD5() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD6() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD7() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD8() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD9() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDA() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDB() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDC() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDD() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDE() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDF() { Console.Write("(Not Implemented)"); }
 
         #endregion
 
@@ -310,19 +310,19 @@ namespace GBASharp
         public static void Code0xE0() { OpcodeHelpers.LDIO(CPU.GetByteFromPC(), CPU.reg_a); }
         public static void Code0xE1() { OpcodeHelpers.POPxHL(); }
         public static void Code0xE2() { OpcodeHelpers.LDIO(CPU.C_Register, CPU.reg_a); }
-        public static void Code0xE3() { }
-        public static void Code0xE4() { }
-        public static void Code0xE5() { }
-        public static void Code0xE6() { }
-        public static void Code0xE7() { }
+        public static void Code0xE3() { Console.Write("(Not Implemented)"); }
+        public static void Code0xE4() { Console.Write("(Not Implemented)"); }
+        public static void Code0xE5() { Console.Write("(Not Implemented)"); }
+        public static void Code0xE6() { Console.Write("(Not Implemented)"); }
+        public static void Code0xE7() { Console.Write("(Not Implemented)"); }
         public static void Code0xE8() { OpcodeHelpers.ADDSP(); }
-        public static void Code0xE9() { }
+        public static void Code0xE9() { Console.Write("(Not Implemented)"); }
         public static void Code0xEA() { OpcodeHelpers.LD(CPU.GetWordFromPC(), CPU.reg_a); }
-        public static void Code0xEB() { }
-        public static void Code0xEC() { }
-        public static void Code0xED() { }
-        public static void Code0xEE() { }
-        public static void Code0xEF() { }
+        public static void Code0xEB() { Console.Write("(Not Implemented)"); }
+        public static void Code0xEC() { Console.Write("(Not Implemented)"); }
+        public static void Code0xED() { Console.Write("(Not Implemented)"); }
+        public static void Code0xEE() { Console.Write("(Not Implemented)"); }
+        public static void Code0xEF() { Console.Write("(Not Implemented)"); }
 
         #endregion
 
@@ -442,18 +442,16 @@ namespace GBASharp
         public static void ADDSP()
         {
             byte reg = CPU.GetByteFromPC();
-            int sum = (ushort)((ushort)(CPU.reg_sp & 0xff) + (ushort)(reg >= 0x80 ? (reg - 0x100) : reg));
+            sbyte signedVal = (sbyte)reg;
+            short lowSP = (short)(CPU.reg_sp & 0xFF);
+            short unsignedSum = (short)(lowSP + (reg & 0xFF));
 
             SetFlagZ(false);
             SetFlagN(false);
             SetFlagH((byte)((CPU.reg_sp & 0xf) + (reg & 0xf))); //Overflow from bit 3
-            SetFlagC(sum > 0xff);   //Overflow from bit 7
+            SetFlagC(unsignedSum > 0xff);   //Overflow from bit 7
 
-            CPU.reg_sp = (ushort)(CPU.reg_sp + signed(reg));
-            //if (reg >= 0x80)
-            //    result = (ushort)(CPU.reg_sp - (reg - 0x80));
-            //else
-            //    result = (ushort)(CPU.reg_sp + reg);
+            CPU.reg_sp = (ushort)(CPU.reg_sp + signedVal);
         }
 
         private static int signed(byte value)
@@ -843,18 +841,35 @@ namespace GBASharp
             SetFlagH(false);
         }
 
-        public static byte RLC(byte reg)
+        public static byte RLC(byte reg, bool updateZ = false)
         {
             byte topMost = (byte)(reg >> 7 & 0x1);
             CPU.flag_c = topMost;
-            return (byte)(reg << 1 | topMost);
+            byte result = (byte)(reg << 1 | topMost);
+
+            if (updateZ)
+                SetFlagZ(result == 0);
+
+            SetFlagH(false);
+            SetFlagN(false);
+
+            return result;
         }
 
-        public static byte RRC(byte reg)
+        public static byte RRC(byte reg, bool updateZ = false)
         {
             byte bottomMost = (byte)(reg & 0x1);
             CPU.flag_c = bottomMost;
-            return (byte)(bottomMost << 7 | reg >> 1);
+
+            byte result = (byte)(bottomMost << 7 | reg >> 1);
+
+            if (updateZ)
+                SetFlagZ(result == 0);
+
+            SetFlagH(false);
+            SetFlagN(false);
+
+            return result;
         }
 
         public static void RLA()
@@ -873,20 +888,38 @@ namespace GBASharp
             SetFlagH(false);
         }
 
-        public static byte RL(byte reg)
+        public static byte RL(byte reg, bool updateZ = false)
         {
             byte flag = CPU.flag_c;
             byte topMost = (byte)(reg >> 7 & 0x1);
             CPU.flag_c = topMost;
-            return (byte)(reg << 1 | flag);
+
+            byte result = (byte)(reg << 1 | flag);
+
+            if (updateZ)
+                SetFlagZ(result == 0);
+
+            SetFlagH(false);
+            SetFlagN(false);
+
+            return result;
         }
 
-        public static byte RR(byte reg)
+        public static byte RR(byte reg, bool updateZ = false)
         {
             byte flag = CPU.flag_c;
             byte bottomMost = (byte)(reg & 0x1);
             CPU.flag_c = bottomMost;
-            return (byte)(flag << 7 | reg >> 1);
+
+            byte result = (byte)(flag << 7 | reg >> 1);
+
+            if (updateZ)
+                SetFlagZ(result == 0);
+
+            SetFlagH(false);
+            SetFlagN(false);
+
+            return result;
         }
 
         public static void JR() { JR(0x0, ignore: true); }
@@ -975,5 +1008,41 @@ namespace GBASharp
         public static void PUSH(ushort register) { }
 
         public static void PUSHxAF() { }
+
+        public static void JP()
+        {
+            ushort word = CPU.GetWordFromPC();
+            CPU.pc = word;
+        }
+
+        public static void JPxNZ()
+        {
+            ushort word = CPU.GetWordFromPC();
+            if(CPU.flag_z == 0x0)
+                CPU.pc = word;
+        }
+
+        public static void CALL()
+        {
+            ushort word = CPU.GetWordFromPC();
+            CPU.reg_sp -= 0x1;
+            CPU.memory[CPU.reg_sp] = (byte)(CPU.pc >> 8);
+            CPU.reg_sp -= 0x1;
+            CPU.memory[CPU.reg_sp] = (byte)(CPU.pc);
+            CPU.pc = word;
+        }
+
+        public static void RET()
+        {
+            CPU.pc = (ushort)((CPU.memory[CPU.reg_sp + 1] << 8) | CPU.memory[CPU.reg_sp]);
+            CPU.reg_sp += 2;
+        }
+
+        public static void PREFIX()
+        {
+            //Executes another opcode at the PC memory address
+            byte opAddr = CPU.GetByteFromPC();
+            CPU.ExecuteCBOpcode(opAddr);
+        }
     }
 }

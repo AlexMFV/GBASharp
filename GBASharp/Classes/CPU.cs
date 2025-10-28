@@ -137,8 +137,137 @@ namespace GBASharp
             return true;
         }
 
+        public static void ExecuteCBOpcode(byte opcode)
+        {
+            int group = (opcode >> 6) & 0x03;
+            int y = (opcode >> 3) & 0x07;
+            int r = opcode & 0x07;
+
+            if (r == 6)
+            {
+                // (HL) special case — read byte from memory[HL]
+            }
+
+            switch (group)
+            {
+                case 0: HandleRotateShift(y, r); break;
+                case 1: HandleBitTest(y, r); break;
+                case 2: HandleBitReset(y, r); break;
+                case 3: HandleBitSet(y, r); break;
+            }
+        }
+
+        static byte ResolveRegister(int r)
+        {
+            switch (r)
+            {
+                case 0: return CPU.B_Register;
+                case 1: return CPU.C_Register;
+                case 2: return CPU.D_Register;
+                case 3: return CPU.E_Register;
+                case 4: return CPU.H_Register;
+                case 5: return CPU.L_Register;
+                case 7: return CPU.reg_a;
+                default: return 0x0;
+                    //throw new Exception("(HL) not handled here");
+            }
+        }
+
+        static void SaveToRegister(int r, byte newValue)
+        {
+            switch (r)
+            {
+                case 0: CPU.B_Register = newValue; break;
+                case 1: CPU.C_Register = newValue; break;
+                case 2: CPU.D_Register = newValue; break;
+                case 3: CPU.E_Register = newValue; break;
+                case 4: CPU.H_Register = newValue; break;
+                case 5: CPU.L_Register = newValue; break;
+                case 7: CPU.reg_a = newValue; break;
+                default: break;
+                    //throw new Exception("(HL) not handled here");
+            }
+        }
+
+        static void HandleRotateShift(int y, int r)
+        {
+            byte reg = ResolveRegister(r);
+
+            byte newValue = 0x0;
+
+            switch (y)
+            {
+                case 0: newValue = OpcodeHelpers.RLC(reg, true); break;
+                case 1: newValue = OpcodeHelpers.RRC(reg, true); break;
+                case 2: newValue = OpcodeHelpers.RL(reg, true); break;
+                case 3: newValue = OpcodeHelpers.RR(reg, true); break;
+                //case 4: OpcodeHelpers.SLA(reg); break;
+                //case 5: OpcodeHelpers.SRA(reg); break;
+                //case 6: OpcodeHelpers.SWAP(reg); break;
+                //case 7: OpcodeHelpers.SRL(reg); break;
+            }
+
+            SaveToRegister(r, newValue);
+        }
+
+        static void HandleBitTest(int bit, int r)
+        {
+            if (r == 6)
+                BIT(bit, CPU.memory[CPU.HL_Register]); // no write-back
+            else
+                BIT(bit, ResolveRegister(r));
+        }
+
+        static void HandleBitReset(int bit, int r)
+        {
+            if (r == 6)
+            {
+                byte val = CPU.memory[CPU.HL_Register];
+                RES(bit, val);
+                CPU.memory[CPU.HL_Register] = val;
+            }
+            else
+                RES(bit, ResolveRegister(r));
+        }
+
+        static void HandleBitSet(int bit, int r)
+        {
+            if (r == 6)
+            {
+                ushort addr = CPU.HL_Register;
+                byte val = CPU.memory[addr];
+                SET(bit, val);
+                CPU.memory[addr] = val;       // write back
+            }
+            else
+                SET(bit, ResolveRegister(r));
+        }
+
+        static void BIT(int bit, byte reg)
+        {
+            CPU.flag_z = (byte)(((reg >> bit) & 1) == 0 ? 1 : 0);
+            CPU.flag_n = 0;
+            CPU.flag_h = 1;
+        }
+
+        static void RES(int bit, byte reg)
+        {
+            reg = (byte)(reg & ~(1 << bit));
+        }
+
+        static void SET(int bit, byte reg)
+        {
+            reg = (byte)(reg | (1 << bit));
+        }
+
         public static void ExecuteOpcode(byte opcode)
         {
+            if (CPU.opcode != 0x0)
+            {
+                Console.WriteLine("");
+                Console.Write($"OPCODE: 0x{CPU.opcode:X2} ");
+            }
+
             switch (opcode)
             {
                 #region 0x
@@ -479,7 +608,7 @@ namespace GBASharp
 
                 default: break;
             }
-
+            
             pc += 0x1;
         }
 

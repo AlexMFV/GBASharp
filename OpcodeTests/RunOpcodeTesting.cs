@@ -343,18 +343,18 @@ namespace OpcodeTests
 
         [TestMethod] public void Test0xC0() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xC1() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xC2() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xC3() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xC2() { TestOpcode(0xC2, LoadTests("C2")); }
+        [TestMethod] public void Test0xC3() { TestOpcode(0xC3, LoadTests("C3")); }
         [TestMethod] public void Test0xC4() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xC5() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xC6() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xC7() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xC8() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xC9() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xC9() { TestOpcode(0xC9, LoadTests("C9")); }
         [TestMethod] public void Test0xCA() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xCB() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xCB() { TestOpcode(0xCB, LoadTests("CB")); }
         [TestMethod] public void Test0xCC() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xCD() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xCD() { TestOpcode(0xCD, LoadTests("CD")); }
         [TestMethod] public void Test0xCE() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xCF() { Assert.Inconclusive(); }
 
