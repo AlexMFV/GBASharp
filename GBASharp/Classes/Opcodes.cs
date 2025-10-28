@@ -900,7 +900,35 @@ namespace GBASharp
 
         public static void DAA()
         {
+            //We need to do BCD arithmetic, this mean we must treat the values as decimal and not hex
+            //for example 0x66 means 66 and not 102
+            //For this we can isolate the nibbles (one nibble is half a byte or 4 bits), each nibble is a decimal value
+            //Hex is represented in the following, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F
+            //So when we have something higher than 9 we just add 6 meaning it will skip the letters, and we add 1 to the next nibble
 
+            if(CPU.flag_n == 0) //n == 0 (addition)
+            {
+                //Lower nibble has invalid BCD value or carry flag is enabled we add 0x06
+                if((CPU.reg_a & 0x0f) > 0x9 || CPU.flag_h == 0x1)
+                    CPU.reg_a += 0x06;
+
+                if (CPU.reg_a > 0x9F || CPU.flag_c == 0x1)
+                {
+                    CPU.reg_a += 0x60;
+                    SetFlagC(true);
+                }
+            }
+            else //n == 1 (subtraction)
+            {
+                if (CPU.flag_h == 0x1)
+                    CPU.reg_a -= 0x06;
+
+                if (CPU.flag_c == 0x1)
+                    CPU.reg_a -= 0x60;
+            }
+
+            SetFlagZ(CPU.reg_a == 0x0);
+            SetFlagH(0x0); //Clear
         }
 
         public static void SCF()
