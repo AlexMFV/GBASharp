@@ -10,7 +10,7 @@ namespace GBASharp
 {
     public static class Opcodes
     {
-        #region 0x (0x08 not implemented)
+        #region 0x (Done)
 
         public static void Code0x00() { OpcodeHelpers.NOP(); }
         public static void Code0x01() { OpcodeHelpers.LDxBC(); }
@@ -20,7 +20,7 @@ namespace GBASharp
         public static void Code0x05() { OpcodeHelpers.DECxB(); }
         public static void Code0x06() { OpcodeHelpers.LDxB(CPU.GetByteFromPC()); }
         public static void Code0x07() { OpcodeHelpers.RLCA(); }
-        public static void Code0x08() {  }
+        public static void Code0x08() { OpcodeHelpers.LDa16SP(); }
         public static void Code0x09() { OpcodeHelpers.ADDtoHL(CPU.BC_Register); }
         public static void Code0x0A() { OpcodeHelpers.LDxA(CPU.BC_Register); }
         public static void Code0x0B() { OpcodeHelpers.DECxBC(); }
@@ -671,6 +671,13 @@ namespace GBASharp
         public static void LDmHLD() { CPU.memory[CPU.HL_Register] = CPU.reg_a; CPU.HL_Register -= 0x1; } //Decrement
 
         public static void LDmSP() { CPU.memory[CPU.reg_sp] = CPU.reg_a; }
+
+        public static void LDa16SP()
+        {
+            ushort word = CPU.GetWordFromPC();
+            CPU.memory[word] = (byte)(CPU.reg_sp & 0xff);
+            CPU.memory[word + 1] = (byte)(CPU.reg_sp >> 8);
+        }
 
         public static void LDH() {  }
 

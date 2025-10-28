@@ -97,7 +97,7 @@ namespace OpcodeTests
         [TestMethod] public void Test0x05() { TestOpcode(0x05, LoadTests("05")); }
         [TestMethod] public void Test0x06() { TestOpcode(0x06, LoadTests("06")); }
         [TestMethod] public void Test0x07() { TestOpcode(0x07, LoadTests("07")); }
-        [TestMethod] public void Test0x08() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0x08() { TestOpcode(0x08, LoadTests("08")); }
         [TestMethod] public void Test0x09() { TestOpcode(0x09, LoadTests("09")); }
         [TestMethod] public void Test0x0A() { TestOpcode(0x0A, LoadTests("0A")); }
         [TestMethod] public void Test0x0B() { TestOpcode(0x0B, LoadTests("0B")); }

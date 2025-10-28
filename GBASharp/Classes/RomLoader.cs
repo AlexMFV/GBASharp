@@ -9,6 +9,10 @@
             {
                 Cartridge.ROM = File.ReadAllBytes(fullPath);
             }
+            else
+            {
+                throw new Exception("No ROM found in directory");
+            }
         }
 
         public static void LoadBootRom(string filename)
@@ -17,6 +21,10 @@
             if (File.Exists(fullPath))
             {
                 CPU.bootROM = File.ReadAllBytes(fullPath);
+            }
+            else
+            {
+                throw new Exception("No boot ROM found in directory");
             }
         }
 

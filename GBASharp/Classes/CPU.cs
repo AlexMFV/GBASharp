@@ -527,7 +527,7 @@ namespace GBASharp
             //Clear and Load ROMs
             ClearMemory();
             LoadBootROM();
-            //LoadRomToMemory();
+            LoadRomToMemory();
         }
 
         public static void ClearMemory()
