@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -52,7 +53,7 @@ namespace GBASharp
 
         #endregion
 
-        #region 2x (0x27 not implemented)
+        #region 2x (Done)
 
         public static void Code0x20() { OpcodeHelpers.JR(CPU.flag_z, false); }
         public static void Code0x21() { OpcodeHelpers.LDxHL(); }
@@ -441,18 +442,25 @@ namespace GBASharp
         public static void ADDSP()
         {
             byte reg = CPU.GetByteFromPC();
-            ushort sum = (ushort)((CPU.reg_sp & 0xff) + (reg > 0x80 ? (reg - 0x80) : reg));
+            int sum = (ushort)((ushort)(CPU.reg_sp & 0xff) + (ushort)(reg >= 0x80 ? (reg - 0x100) : reg));
 
             SetFlagZ(false);
             SetFlagN(false);
             SetFlagH((byte)((CPU.reg_sp & 0xf) + (reg & 0xf))); //Overflow from bit 3
             SetFlagC(sum > 0xff);   //Overflow from bit 7
 
-            if(reg > 0x80)
-                CPU.reg_sp -= (byte)(reg - 0x80);
-            else
-                CPU.reg_sp += reg;
+            CPU.reg_sp = (ushort)(CPU.reg_sp + signed(reg));
+            //if (reg >= 0x80)
+            //    result = (ushort)(CPU.reg_sp - (reg - 0x80));
+            //else
+            //    result = (ushort)(CPU.reg_sp + reg);
+        }
 
+        private static int signed(byte value)
+        {
+            if (value >= 0x80)
+                return value - 0x100;
+            return value;
         }
 
         public static void ADDHL(ushort reg)
@@ -954,8 +962,12 @@ namespace GBASharp
 
         public static void POPxHL()
         {
-            CPU.HL_Register = (ushort)(CPU.memory[CPU.reg_sp] & 0xff00 + CPU.memory[CPU.reg_sp] & 0xff);
-            CPU.reg_sp += 0x2;
+            CPU.L_Register = (byte)(CPU.memory[CPU.reg_sp] & 0xff);
+            CPU.reg_sp++;
+            CPU.H_Register = (byte)(CPU.memory[CPU.reg_sp] & 0xff);
+            CPU.reg_sp++;
+            //CPU.HL_Register = (ushort)((CPU.memory[CPU.reg_sp] >> 4 & 0xff) + (CPU.memory[CPU.reg_sp] & 0xff));
+            //CPU.reg_sp += 0x2;
         }
         
         public static void POPxAF() {  }
