@@ -193,8 +193,25 @@ namespace GBASharp
         {
             byte reg = ResolveRegister(r);
 
-            byte newValue = 0x0;
+            if (r == 6)
+            {
+                ushort addr = CPU.HL_Register;
+                byte val = CPU.memory[addr];
 
+                switch (y)
+                {
+                    case 0: val = OpcodeHelpers.RLC(val, true); break;
+                    case 1: val = OpcodeHelpers.RRC(val, true); break;
+                    case 2: val = OpcodeHelpers.RL(val, true); break;
+                    case 3: val = OpcodeHelpers.RR(val, true); break;
+                        // SLA/SRA/SWAP/SRL later
+                }
+
+                CPU.memory[addr] = val;
+                return;
+            }
+
+            byte newValue = 0x0;
             switch (y)
             {
                 case 0: newValue = OpcodeHelpers.RLC(reg, true); break;
@@ -223,11 +240,14 @@ namespace GBASharp
             if (r == 6)
             {
                 byte val = CPU.memory[CPU.HL_Register];
-                RES(bit, val);
+                val = RES(bit, val);
                 CPU.memory[CPU.HL_Register] = val;
             }
             else
-                RES(bit, ResolveRegister(r));
+            {
+                byte val = RES(bit, ResolveRegister(r));
+                SaveToRegister(r, val);
+            }
         }
 
         static void HandleBitSet(int bit, int r)
@@ -236,11 +256,14 @@ namespace GBASharp
             {
                 ushort addr = CPU.HL_Register;
                 byte val = CPU.memory[addr];
-                SET(bit, val);
+                val = SET(bit, val);
                 CPU.memory[addr] = val;       // write back
             }
             else
-                SET(bit, ResolveRegister(r));
+            {
+                byte val = SET(bit, ResolveRegister(r));
+                SaveToRegister(r, val);
+            }
         }
 
         static void BIT(int bit, byte reg)
@@ -250,14 +273,14 @@ namespace GBASharp
             CPU.flag_h = 1;
         }
 
-        static void RES(int bit, byte reg)
+        static byte RES(int bit, byte reg)
         {
-            reg = (byte)(reg & ~(1 << bit));
+            return (byte)(reg & ~(1 << bit));
         }
 
-        static void SET(int bit, byte reg)
+        static byte SET(int bit, byte reg)
         {
-            reg = (byte)(reg | (1 << bit));
+            return (byte)(reg | (1 << bit));
         }
 
         public static void ExecuteOpcode(byte opcode)
