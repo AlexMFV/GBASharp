@@ -1044,5 +1044,84 @@ namespace GBASharp
             byte opAddr = CPU.GetByteFromPC();
             CPU.ExecuteCBOpcode(opAddr);
         }
+
+        public static byte SLA(byte reg)
+        {
+            //The left bit if outside 16bits, check C flag
+            SetFlagC((reg >> 7 & 0x1) == 0x1);
+
+            //Clearn N and H flags
+            SetFlagH(false);
+            SetFlagN(false);
+
+            //Shift reg 1 bit to left
+            byte shifted = (byte)(reg << 1);
+
+            //if reg == 0 then flag Z = 1, else 0
+            SetFlagZ(shifted == 0x0);
+
+            //return shifted reg?
+            return shifted;
+        }
+
+        public static byte SRA(byte reg)
+        {
+            //Save right most bit and toggle C flag based on it
+            SetFlagC((reg & 0x1) == 0x1);
+
+            //Save left most bit
+            byte leftmost = (byte)(reg >> 7 & 0x1); //0x1 or 0x0
+
+            //shift all 1 to the right
+            reg >>= 1;
+
+            //if left most bit was 1, then we add 0x80 (1 in 8th bit in binary)
+            if (leftmost == 0x1)
+                reg += 0x80;
+
+            //Clearn N and H flags
+            SetFlagH(false);
+            SetFlagN(false);
+            SetFlagZ(reg == 0x0);
+
+            return reg;
+        }
+
+        public static byte SWAP(byte reg)
+        {
+            //Split both lower and higher bits
+            byte lowerBits = (byte)(reg & 0xf);
+            byte higherBits = (byte)(reg >> 4 & 0xf);
+
+            //Flip them
+            byte result = (byte)(lowerBits << 4 | higherBits);
+
+            //Reset the flags and set the Z flag if result is 0x0
+            SetFlagH(false);
+            SetFlagN(false);
+            SetFlagC(false);
+            SetFlagZ(result == 0x0);
+
+            return result;
+        }
+
+        public static byte SRL(byte reg)
+        {
+            //Save right most bit and toggle C flag based on it
+            SetFlagC((reg & 0x1) == 0x1);
+
+            //Save left most bit
+            byte leftmost = (byte)(reg >> 7 & 0x1); //0x1 or 0x0
+
+            //shift all 1 to the right
+            reg >>= 1;
+
+            //Clearn N and H flags
+            SetFlagH(false);
+            SetFlagN(false);
+            SetFlagZ(reg == 0x0);
+
+            return reg;
+        }
     }
 }

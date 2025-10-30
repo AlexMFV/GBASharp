@@ -143,11 +143,6 @@ namespace GBASharp
             int y = (opcode >> 3) & 0x07;
             int r = opcode & 0x07;
 
-            if (r == 6)
-            {
-                // (HL) special case — read byte from memory[HL]
-            }
-
             switch (group)
             {
                 case 0: HandleRotateShift(y, r); break;
@@ -191,25 +186,16 @@ namespace GBASharp
 
         static void HandleRotateShift(int y, int r)
         {
-            byte reg = ResolveRegister(r);
+            byte reg;
 
+            //Necessary for the HL operation only
             if (r == 6)
             {
                 ushort addr = CPU.HL_Register;
-                byte val = CPU.memory[addr];
-
-                switch (y)
-                {
-                    case 0: val = OpcodeHelpers.RLC(val, true); break;
-                    case 1: val = OpcodeHelpers.RRC(val, true); break;
-                    case 2: val = OpcodeHelpers.RL(val, true); break;
-                    case 3: val = OpcodeHelpers.RR(val, true); break;
-                        // SLA/SRA/SWAP/SRL later
-                }
-
-                CPU.memory[addr] = val;
-                return;
+                reg = CPU.memory[addr];
             }
+            else
+                reg = ResolveRegister(r);
 
             byte newValue = 0x0;
             switch (y)
@@ -218,13 +204,16 @@ namespace GBASharp
                 case 1: newValue = OpcodeHelpers.RRC(reg, true); break;
                 case 2: newValue = OpcodeHelpers.RL(reg, true); break;
                 case 3: newValue = OpcodeHelpers.RR(reg, true); break;
-                //case 4: OpcodeHelpers.SLA(reg); break;
-                //case 5: OpcodeHelpers.SRA(reg); break;
-                //case 6: OpcodeHelpers.SWAP(reg); break;
-                //case 7: OpcodeHelpers.SRL(reg); break;
+                case 4: newValue = OpcodeHelpers.SLA(reg); break;
+                case 5: newValue = OpcodeHelpers.SRA(reg); break;
+                case 6: newValue = OpcodeHelpers.SWAP(reg); break;
+                case 7: newValue = OpcodeHelpers.SRL(reg); break;
             }
 
-            SaveToRegister(r, newValue);
+            if (r != 6)
+                SaveToRegister(r, newValue);
+            else
+                CPU.memory[CPU.HL_Register] = newValue;
         }
 
         static void HandleBitTest(int bit, int r)
