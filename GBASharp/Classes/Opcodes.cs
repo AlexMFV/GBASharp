@@ -265,15 +265,15 @@ namespace GBASharp
 
         #region Cx
 
-        public static void Code0xC0() { Console.Write("(Not Implemented)"); }
-        public static void Code0xC1() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC0() { OpcodeHelpers.RET(CPU.flag_z == 0); }
+        public static void Code0xC1() { OpcodeHelpers.POPxBC(); }
         public static void Code0xC2() { OpcodeHelpers.JPxNZ(); }
         public static void Code0xC3() { OpcodeHelpers.JP(); }
         public static void Code0xC4() { Console.Write("(Not Implemented)"); }
-        public static void Code0xC5() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC5() { OpcodeHelpers.PUSH(CPU.B_Register, CPU.C_Register); }
         public static void Code0xC6() { Console.Write("(Not Implemented)"); }
         public static void Code0xC7() { Console.Write("(Not Implemented)"); }
-        public static void Code0xC8() { Console.Write("(Not Implemented)"); }
+        public static void Code0xC8() { OpcodeHelpers.RET(CPU.flag_z == 1); }
         public static void Code0xC9() { OpcodeHelpers.RET(); }
         public static void Code0xCA() { Console.Write("(Not Implemented)"); }
         public static void Code0xCB() { OpcodeHelpers.PREFIX(); }
@@ -286,15 +286,15 @@ namespace GBASharp
 
         #region Dx
 
-        public static void Code0xD0() { Console.Write("(Not Implemented)"); }
-        public static void Code0xD1() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD0() { OpcodeHelpers.RET(CPU.flag_c == 0); }
+        public static void Code0xD1() { OpcodeHelpers.POPxDE(); }
         public static void Code0xD2() { Console.Write("(Not Implemented)"); }
         public static void Code0xD3() { Console.Write("(Not Implemented)"); }
         public static void Code0xD4() { Console.Write("(Not Implemented)"); }
-        public static void Code0xD5() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD5() { OpcodeHelpers.PUSH(CPU.D_Register, CPU.E_Register); }
         public static void Code0xD6() { Console.Write("(Not Implemented)"); }
         public static void Code0xD7() { Console.Write("(Not Implemented)"); }
-        public static void Code0xD8() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD8() { OpcodeHelpers.RET(CPU.flag_c == 1); }
         public static void Code0xD9() { Console.Write("(Not Implemented)"); }
         public static void Code0xDA() { Console.Write("(Not Implemented)"); }
         public static void Code0xDB() { Console.Write("(Not Implemented)"); }
@@ -398,46 +398,6 @@ namespace GBASharp
 
             CPU.reg_a = (byte)(sum & 0xff);
         }
-
-        /*public static void ADDSP()
-        {
-            byte immediate = CPU.GetByteFromPC();
-            sbyte signed = (sbyte)(immediate - 0x80);
-
-            ushort sum = (0x0);
-
-            sum = (ushort)(CPU.reg_sp + signed);
-
-            //if(signed < 0x0)
-            //    sum = (ushort)(CPU.reg_sp + immediate);
-            //else
-            //    sum = (ushort)(CPU.reg_sp - (immediate - 0x80));
-
-            SetFlagZ(false);
-            SetFlagN(false);
-
-            SetFlagH((byte)((CPU.reg_sp & 0xf) + (signed & 0xf)));  //Overflow from bit 3
-
-            //if(signed < 0x0)
-            //    SetFlagH((byte)((CPU.reg_sp & 0xf) - (immediate & 0xf))); //Overflow from bit 3
-            //else
-            //    SetFlagH((byte)((CPU.reg_sp & 0xf) + (immediate & 0xf))); //Overflow from bit 3
-
-            SetFlagC(sum > 0xff); //Overflow from 7 bit (whole value)
-
-            //if(signed < 0x0)
-            //    SetFlagC(immediate > 0xff); //Overflow from 7 bit (whole value)
-            //else
-            //    SetFlagC((immediate - 0x80) > 0xff); //Overflow from 7 bit (whole value)
-
-            CPU.reg_sp += (byte)(signed & 0xFF);
-
-            //Should return a value from -128 to 127 (255)
-            //if (signed < 0x0)
-            //    CPU.reg_sp += (byte)(immediate & 0xFF);
-            //else
-            //    CPU.reg_sp -= (byte)((immediate - 0x80) & 0xFF);
-        }*/
 
         public static void ADDSP()
         {
@@ -1002,10 +962,30 @@ namespace GBASharp
             //CPU.HL_Register = (ushort)((CPU.memory[CPU.reg_sp] >> 4 & 0xff) + (CPU.memory[CPU.reg_sp] & 0xff));
             //CPU.reg_sp += 0x2;
         }
-        
-        public static void POPxAF() {  }
 
-        public static void PUSH(ushort register) { }
+        public static void POPxBC()
+        {
+            CPU.B_Register = CPU.memory[CPU.reg_sp + 1];
+            CPU.C_Register = CPU.memory[CPU.reg_sp];
+            CPU.reg_sp += 0x2;
+        }
+
+        public static void POPxDE()
+        {
+            CPU.D_Register = CPU.memory[CPU.reg_sp + 1];
+            CPU.E_Register = CPU.memory[CPU.reg_sp];
+            CPU.reg_sp += 0x2;
+        }
+
+        public static void PUSH(byte high, byte low)
+        {
+            DECxSP();
+            LD(CPU.reg_sp, high);
+            DECxSP();
+            LD(CPU.reg_sp, low);
+        }
+
+        public static void POPxAF() {  }
 
         public static void PUSHxAF() { }
 
@@ -1030,6 +1010,12 @@ namespace GBASharp
             CPU.reg_sp -= 0x1;
             CPU.memory[CPU.reg_sp] = (byte)(CPU.pc);
             CPU.pc = word;
+        }
+
+        public static void RET(bool condition)
+        {
+            if (condition)
+                RET();
         }
 
         public static void RET()

@@ -277,7 +277,7 @@ namespace GBASharp
             if (CPU.opcode != 0x0)
             {
                 Console.WriteLine("");
-                Console.Write($"OPCODE: 0x{CPU.opcode:X2} ");
+                Console.Write($"{CPU.pc:X8} - OPCODE: 0x{CPU.opcode:X2} (SP: {CPU.reg_sp:X2})");
             }
 
             switch (opcode)
@@ -621,7 +621,7 @@ namespace GBASharp
                 default: break;
             }
             
-            pc += 0x1;
+            //pc += 0x1;
         }
 
         #endregion
@@ -668,7 +668,7 @@ namespace GBASharp
             //Clear and Load ROMs
             ClearMemory();
             LoadBootROM();
-            LoadRomToMemory();
+            //LoadRomToMemory();
         }
 
         public static void ClearMemory()
@@ -699,6 +699,7 @@ namespace GBASharp
                 pc = 0xFFFF-0x1;
 
             opcode = memory[pc];
+            pc += 1;
         }
 
         public static void Decode()
