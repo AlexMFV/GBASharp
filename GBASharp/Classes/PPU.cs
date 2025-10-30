@@ -86,6 +86,9 @@ namespace GBASharp
                 if (scanline >= scanlineVBlank) //scanline_cycle? Doesn't make sense
                     scanline = 0;
 
+                //Still need to understand where to put this (the boot will only advance if this is correct)
+                CPU.memory[0xFF44] = (byte)scanline; //Write the scanline to the register
+
                 return;
             }
 

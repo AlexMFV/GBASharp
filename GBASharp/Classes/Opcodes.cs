@@ -292,7 +292,7 @@ namespace GBASharp
         public static void Code0xD3() { Console.Write("(Not Implemented)"); }
         public static void Code0xD4() { Console.Write("(Not Implemented)"); }
         public static void Code0xD5() { OpcodeHelpers.PUSH(CPU.D_Register, CPU.E_Register); }
-        public static void Code0xD6() { Console.Write("(Not Implemented)"); }
+        public static void Code0xD6() { OpcodeHelpers.SUB(CPU.GetByteFromPC()); }
         public static void Code0xD7() { Console.Write("(Not Implemented)"); }
         public static void Code0xD8() { OpcodeHelpers.RET(CPU.flag_c == 1); }
         public static void Code0xD9() { Console.Write("(Not Implemented)"); }
@@ -300,7 +300,7 @@ namespace GBASharp
         public static void Code0xDB() { Console.Write("(Not Implemented)"); }
         public static void Code0xDC() { Console.Write("(Not Implemented)"); }
         public static void Code0xDD() { Console.Write("(Not Implemented)"); }
-        public static void Code0xDE() { Console.Write("(Not Implemented)"); }
+        public static void Code0xDE() { OpcodeHelpers.SBC(CPU.GetByteFromPC()); }
         public static void Code0xDF() { Console.Write("(Not Implemented)"); }
 
         #endregion
@@ -316,7 +316,7 @@ namespace GBASharp
         public static void Code0xE6() { Console.Write("(Not Implemented)"); }
         public static void Code0xE7() { Console.Write("(Not Implemented)"); }
         public static void Code0xE8() { OpcodeHelpers.ADDSP(); }
-        public static void Code0xE9() { Console.Write("(Not Implemented)"); }
+        public static void Code0xE9() { OpcodeHelpers.JPxHL(); }
         public static void Code0xEA() { OpcodeHelpers.LD(CPU.GetWordFromPC(), CPU.reg_a); }
         public static void Code0xEB() { Console.Write("(Not Implemented)"); }
         public static void Code0xEC() { Console.Write("(Not Implemented)"); }
@@ -337,12 +337,12 @@ namespace GBASharp
         public static void Code0xF6() { }
         public static void Code0xF7() { }
         public static void Code0xF8() { }
-        public static void Code0xF9() { }
+        public static void Code0xF9() { OpcodeHelpers.LDxSP16(CPU.HL_Register); }
         public static void Code0xFA() { OpcodeHelpers.LDxA(CPU.memory[CPU.GetWordFromPC()]); }
         public static void Code0xFB() { }
         public static void Code0xFC() { }
         public static void Code0xFD() { }
-        public static void Code0xFE() { }
+        public static void Code0xFE() { OpcodeHelpers.CP(CPU.GetByteFromPC()); }
         public static void Code0xFF() { }
 
         #endregion
@@ -585,7 +585,9 @@ namespace GBASharp
         }
         
         public static void LD(ushort address, byte value) { CPU.memory[address] = value; }
-        
+
+        public static void LDxSP16(ushort value) { CPU.reg_sp = value; }
+
         public static void LDIO(byte address, byte value) { CPU.memory[0xff00 + address] = value; }
         
         public static void LDIOxA(byte address) { CPU.reg_a = CPU.memory[0xff00 + address]; }
@@ -988,6 +990,11 @@ namespace GBASharp
         public static void POPxAF() {  }
 
         public static void PUSHxAF() { }
+
+        public static void JPxHL()
+        {
+            CPU.pc = CPU.HL_Register;
+        }
 
         public static void JP()
         {

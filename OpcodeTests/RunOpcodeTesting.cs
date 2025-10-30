@@ -369,7 +369,7 @@ namespace OpcodeTests
         [TestMethod] public void Test0xD3() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xD4() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xD5() { TestOpcode(0xD5, LoadTests("D5")); }
-        [TestMethod] public void Test0xD6() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xD6() { TestOpcode(0xD6, LoadTests("D6")); }
         [TestMethod] public void Test0xD7() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xD8() { TestOpcode(0xD8, LoadTests("D8")); }
         [TestMethod] public void Test0xD9() { Assert.Inconclusive(); }
@@ -377,7 +377,7 @@ namespace OpcodeTests
         [TestMethod] public void Test0xDB() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xDC() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xDD() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xDE() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xDE() { TestOpcode(0xDE, LoadTests("DE")); }
         [TestMethod] public void Test0xDF() { Assert.Inconclusive(); }
 
         #endregion
@@ -393,7 +393,7 @@ namespace OpcodeTests
         [TestMethod] public void Test0xE6() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xE7() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xE8() { TestOpcode(0xE8, LoadTests("E8")); }
-        [TestMethod] public void Test0xE9() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xE9() { TestOpcode(0xE9, LoadTests("E9")); }
         [TestMethod] public void Test0xEA() { TestOpcode(0xEA, LoadTests("EA")); }
         [TestMethod] public void Test0xEB() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xEC() { Assert.Inconclusive(); }
@@ -414,12 +414,12 @@ namespace OpcodeTests
         [TestMethod] public void Test0xF6() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xF7() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xF8() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xF9() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xF9() { TestOpcode(0xF9, LoadTests("F9")); }
         [TestMethod] public void Test0xFA() { TestOpcode(0xFA, LoadTests("FA")); }
         [TestMethod] public void Test0xFB() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xFC() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xFD() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xFE() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xFE() { TestOpcode(0xFE, LoadTests("FE")); }
         [TestMethod] public void Test0xFF() { Assert.Inconclusive(); }
 
         #endregion
