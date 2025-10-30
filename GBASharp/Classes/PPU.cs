@@ -50,6 +50,7 @@ namespace GBASharp
         static double mode3_cycles = 0;
         static bool endMode3 = false;
         static bool startMode3 = true;
+        static bool isMode1 = false;
         public static int scanline = 0;
         static int scanlineVBlank = 144;
         static int max_scanlines = 154;
@@ -78,50 +79,56 @@ namespace GBASharp
             //Reached the end of the scanline (after HBlank)
             if (scanline_cycle >= 456)
             {
-                endMode3 = false;
-                startMode3 = true;
-                scanline_cycle = 0;
                 scanline++;
-
-                if (scanline >= scanlineVBlank) //scanline_cycle? Doesn't make sense
-                    scanline = 0;
-
                 //Still need to understand where to put this (the boot will only advance if this is correct)
                 CPU.memory[0xFF44] = (byte)scanline; //Write the scanline to the register
+
+                //VBlank Period, does nothing so we don't need this we can just skip
+                if (isMode1)
+                    Mode1();
+                else
+                {
+                    endMode3 = false;
+                    startMode3 = true;
+                }
+
+                scanline_cycle = 0;
+
+                if (scanline >= scanlineVBlank) // vblank starts at = 144-154
+                    isMode1 = true;
 
                 return;
             }
 
-            //VBlank Period, does nothing so we don't need this we can just skip
-            //if (scanline > 144 && scanline <= max_scanlines)
-            //    Mode1();
-
-            if (scanline_cycle <= 80)
-                Mode2();
-            else
+            if (!isMode1)
             {
-                if (mode3_cycles <= 289 && !endMode3)
+                if (scanline_cycle <= 80)
+                    Mode2();
+                else
                 {
-                    //Runs only once it enters mode3, to reset all the counters
-                    if (startMode3)
+                    if (mode3_cycles <= 289 && !endMode3)
                     {
-                        mode3_cycles = 0;
-                        scanline_pixel = -1;
-                        startMode3 = false;
+                        //Runs only once it enters mode3, to reset all the counters
+                        if (startMode3)
+                        {
+                            mode3_cycles = 0;
+                            scanline_pixel = -1;
+                            startMode3 = false;
+                        }
+
+                        mode3_cycles++;
+                        scanline_pixel++;
+
+                        //Processed all the pixels for the current scanline
+                        if (scanline_pixel >= 160)
+                        {
+                            endMode3 = true;
+                            return;
+                        }
+
+                        //Need to add a endMode3 = true (if mode3 already processed all pixels before 289 cycles passed)
+                        Mode3();
                     }
-
-                    mode3_cycles++;
-                    scanline_pixel++;
-
-                    //Processed all the pixels for the current scanline
-                    if (scanline_pixel >= 160)
-                    {
-                        endMode3 = true;
-                        return;
-                    }
-
-                    //Need to add a endMode3 = true (if mode3 already processed all pixels before 289 cycles passed)
-                    Mode3();
                 }
             }
         }
@@ -234,12 +241,26 @@ namespace GBASharp
 
             //Step 6 - Needs to be implemented, but can be skipped until bg scrolling is needed
 
-            Screen.SetPixel(scanline, scanline_pixel, color);
+            if(scanline < 144)
+                Screen.SetPixel(scanline, scanline_pixel, color);
         }
 
         public static void Mode0() { }
 
-        public static void Mode1() { }
+        public static void Mode1()
+        {
+            if(scanline == 144)
+            {
+                //Check registers and other stuff
+            }
+
+            //Reached the max scanlines
+            if (scanline >= max_scanlines)
+            {
+                scanline = 0;
+                isMode1 = false;
+            }
+        }
 
         public class Sprite
         {

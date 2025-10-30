@@ -280,6 +280,9 @@ namespace GBASharp
                 Console.Write($"{CPU.pc:X8} - OPCODE: 0x{CPU.opcode:X2} (SP: {CPU.reg_sp:X2})");
             }
 
+            if (CPU.pc == 0x0067)
+                Console.WriteLine($"A={CPU.reg_a:X2}, LY={CPU.memory[0xFF44]}, FlagC={CPU.flag_c:X2} FlagZ={CPU.flag_z:X2} FlagH={CPU.flag_h:X2} FlagN={CPU.flag_n:X2}");
+
             switch (opcode)
             {
                 #region 0x

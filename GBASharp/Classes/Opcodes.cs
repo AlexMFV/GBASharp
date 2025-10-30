@@ -350,6 +350,8 @@ namespace GBASharp
 
     public static class OpcodeHelpers
     {
+
+        //TODO: ALL THIS NEEDS TO BE CHANGED, THE FLAGS SHOULD NOT BE VARIABLES, BUT PART OF THE "AF" REGISTER(IN THIS CASE THE "f" PART)
         public static void SetFlagZ(ushort sum) { CPU.flag_z = (byte)sum == 0x0 ? (byte)0x1 : (byte)0x0; }
         public static void SetFlagZ(bool result) { CPU.flag_z = result ? (byte)0x1 : (byte)0x0; }
         public static void SetFlagN(bool result) { CPU.flag_n = result ? (byte)0x1 : (byte)0x0; }
@@ -564,14 +566,22 @@ namespace GBASharp
             CPU.reg_a = (byte)(sum & 0xff);
         }
 
+        //Old version
+        //public static void CP(byte reg)
+        //{
+        //    ushort sum = (ushort)(CPU.reg_a - reg);
+        //
+        //    SetFlagZ(sum);
+        //    SetFlagN(true);
+        //    SetFlagH((byte)((CPU.reg_a & 0xf) - (reg & 0xf))); //Set if overflow from bit 3
+        //    SetFlagC(reg > CPU.reg_a); //Set if overflow from 7 bit
+        //}
         public static void CP(byte reg)
         {
-            ushort sum = (ushort)(CPU.reg_a - reg);
-
-            SetFlagZ(sum);
+            SetFlagZ(CPU.reg_a == reg);
             SetFlagN(true);
-            SetFlagH((byte)((CPU.reg_a & 0xf) - (reg & 0xf))); //Set if overflow from bit 3
-            SetFlagC(reg > CPU.reg_a); //Set if overflow from 7 bit
+            SetFlagH((CPU.reg_a & 0xF) < (reg & 0xF));
+            SetFlagC(CPU.reg_a < reg);
         }
 
         public static void CPHL(ushort reg)

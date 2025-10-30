@@ -56,8 +56,8 @@ namespace GBASharp
                     cpuCycles = CycleManager.CYCLES_OPCODE[CPU.opcode]; //Cycles used for the execution of the current instruction
                     currCycle += cpuCycles; //Total number of cycles
 
-                    //cpuManager.UpdateCycles(CycleManager.CYCLES_OPCODE[CPU.opcode]);
-                    //ppuManager.UpdateCycles(cpuManager);
+                    cpuManager.UpdateCycles(CycleManager.CYCLES_OPCODE[CPU.opcode]);
+                    ppuManager.UpdateCycles(cpuManager);
 
                     PPU.Process(cpuCycles);
 
@@ -74,14 +74,23 @@ namespace GBASharp
 
                 //Update the screen
                 Raylib.BeginDrawing();
+                //DrawDebugWindow();
                 Raylib.ClearBackground(Raylib.BLACK);
-                Raylib.DrawFPS(10, 10); //Draws the FPS counter
+                Screen.Render();
+                //Raylib.DrawFPS(10, 10); //Draws the FPS counter
                 //Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
                 //Raylib.DrawText("Can Process: " + cpuManager.canProcess, 10, 70, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
 
-                Screen.Render();
                 //Screen.ProcessScanline(PPU.scanline);
                 Raylib.EndDrawing();
+            }
+        }
+
+        private static void DrawDebugWindow()
+        {
+            if (Globals.DEBUG)
+            {
+                Raylib.DrawRectangle(Globals.REAL_SCREEN_WIDTH / 2, 0, Globals.REAL_SCREEN_WIDTH / 2, Globals.REAL_SCREEN_HEIGHT, new Color(0,0,0,1));
             }
         }
     }
