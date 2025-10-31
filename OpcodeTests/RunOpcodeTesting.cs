@@ -406,11 +406,11 @@ namespace OpcodeTests
         #region Fx
 
         [TestMethod] public void Test0xF0() { TestOpcode(0xF0, LoadTests("F0")); }
-        [TestMethod] public void Test0xF1() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xF1() { TestOpcode(0xF1, LoadTests("F1")); }
         [TestMethod] public void Test0xF2() { TestOpcode(0xF2, LoadTests("F2")); }
         [TestMethod] public void Test0xF3() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xF4() { Assert.Inconclusive(); }
-        [TestMethod] public void Test0xF5() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xF5() { TestOpcode(0xF5, LoadTests("F5")); }
         [TestMethod] public void Test0xF6() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xF7() { Assert.Inconclusive(); }
         [TestMethod] public void Test0xF8() { Assert.Inconclusive(); }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Intrinsics.Arm;
@@ -13,22 +14,19 @@ namespace GBASharp
         public static byte[] memory = new byte[0xFFFF]; //64KiB Memory
         public static byte[] bootROM = new byte[0x1FF]; //256b boot ROM
 
-        //Registers
-        public static byte reg_a = 0x0; //Accumulator & Flags
-
-        //Note the reg_af has been replaced with reg_a and the flags have been split up into different variables
-
         //Lower 8 bits of the "reg_af" have the following flags
         //Bit 7 - Zero Flag (z)
         //Bit 6 - Subtraction Flag (n)
         //Bit 5 - Half Carry Flag (h)
         //Bit 4 - Carry Flag (c)
 
-        public static byte flag_z = 0x0;
-        public static byte flag_n = 0x0;
-        public static byte flag_h = 0x0;
-        public static byte flag_c = 0x0;
+        //public static byte flag_z = 0x0;
+        //public static byte flag_n = 0x0;
+        //public static byte flag_h = 0x0;
+        //public static byte flag_c = 0x0;
 
+        //Registers
+        public static ushort reg_af = 0x0; //Accumulator & Flags
         public static ushort reg_bc = 0x0; //BC
         public static ushort reg_de = 0x0; //DE
         public static ushort reg_hl = 0x0; //HL
@@ -47,16 +45,31 @@ namespace GBASharp
         //public static double Cycles { get { return cycles; } set { cycles = value; } }
 
         public static ushort BC_Register { get { return reg_bc; } set { reg_bc = value; } }
-        public static byte B_Register { get { return (byte)(reg_bc >> 8 & 0xff); } set { reg_bc = (ushort)(value << 8 | reg_bc & 0xff); } }
-        public static byte C_Register { get { return (byte)(reg_bc & 0xff); } set { reg_bc = (ushort)((reg_bc >> 8 & 0xff) << 8 | value); } }
+        public static byte B_Register { get { return GetHighByte(reg_bc); } set { reg_bc = SetHighByte(reg_bc, value); } }
+        public static byte C_Register { get { return GetLowByte(reg_bc); } set { reg_bc = SetLowByte(reg_bc, value); } }
 
         public static ushort DE_Register { get { return reg_de; } set { reg_de = value; } }
-        public static byte D_Register { get { return (byte)(reg_de >> 8 & 0xff); } set { reg_de = (ushort)(value << 8 | reg_de & 0xff); } }
-        public static byte E_Register { get { return (byte)(reg_de & 0xff); } set { reg_de = (ushort)((reg_de >> 8 & 0xff) << 8 | value); } }
+        public static byte D_Register { get { return GetHighByte(reg_de); } set { reg_de = SetHighByte(reg_de, value); } }
+        public static byte E_Register { get { return GetLowByte(reg_de); } set { reg_de = SetLowByte(reg_de, value); } }
 
         public static ushort HL_Register { get { return reg_hl; } set { reg_hl = value; } }
-        public static byte H_Register { get { return (byte)(reg_hl >> 8 & 0xff); } set { reg_hl = (ushort)(value << 8 | reg_hl & 0xff); } }
-        public static byte L_Register { get { return (byte)(reg_hl & 0xff); } set { reg_hl = (ushort)((reg_hl >> 8 & 0xff) << 8 | value); } }
+        public static byte H_Register { get { return GetHighByte(reg_hl); } set { reg_hl = SetHighByte(reg_hl, value); } }
+        public static byte L_Register { get { return GetLowByte(reg_hl); } set { reg_hl = SetLowByte(reg_hl, value); } }
+
+
+        public static ushort AF_Register { get { return reg_af; } set { reg_af = value; } }
+        public static byte A_Register { get { return GetHighByte(reg_af); } set { reg_af = SetHighByte(reg_af, value); } }
+        public static byte F_Register { get { return GetLowByte(reg_af); } set { reg_af = SetLowByte(reg_af, value); } }
+
+        public static byte Flag_C { get { return (byte)(F_Register >> 4 & 0x1); } set { F_Register = (byte)((F_Register & 0xE0) + (value << 4)); } }
+        public static byte Flag_H { get { return (byte)(F_Register >> 5 & 0x1); } set { F_Register = (byte)((F_Register & 0xD0) + (value << 5)); } }
+        public static byte Flag_N { get { return (byte)(F_Register >> 6 & 0x1); } set { F_Register = (byte)((F_Register & 0xB0) + (value << 6)); } }
+        public static byte Flag_Z { get { return (byte)(F_Register >> 7 & 0x1); } set { F_Register = (byte)((F_Register & 0x70) + (value << 7)); } }
+
+        private static byte GetLowByte(ushort register) { return (byte)(register & 0xff); }
+        private static byte GetHighByte(ushort register) { return (byte)(register >> 8 & 0xff); }
+        private static ushort SetLowByte(ushort register, byte value) { return (ushort)((register >> 8 & 0xff) << 8 | value); }
+        private static ushort SetHighByte(ushort register, byte value) { return (ushort)(value << 8 | register & 0xff); }
 
         //Memory Breakdown
         //0000 - 3FFF / 16 KiB ROM bank 00              || From cartridge, usually a fixed bank
@@ -76,12 +89,12 @@ namespace GBASharp
 
         public static void SetCPUTesting(byte a, byte b, byte c, byte d, byte e, byte f, byte h, byte l, ushort _pc, ushort sp, List<List<ushort>> replaceMemory)
         {
-            reg_a = a;
-
-            flag_z = (byte)(f >> 7 & 0x1);
-            flag_n = (byte)(f >> 6 & 0x1);
-            flag_h = (byte)(f >> 5 & 0x1);
-            flag_c = (byte)(f >> 4 & 0x1);
+            A_Register = a;
+            F_Register = f;
+            //Flag_C = (byte)(f >> 4 & 0x1);
+            //Flag_H = (byte)(f >> 5 & 0x1);
+            //Flag_N = (byte)(f >> 6 & 0x1);
+            //Flag_Z = (byte)(f >> 7 & 0x1);
 
             reg_bc = (ushort)(b << 8 | c);
             reg_de = (ushort)(d << 8 | e);
@@ -95,7 +108,7 @@ namespace GBASharp
 
         public static bool CheckCPUTesting(byte a, byte b, byte c, byte d, byte e, byte f, byte h, byte l, ushort _pc, ushort sp, List<List<ushort>> checkMemory)
         {
-            if(reg_a != a)
+            if(A_Register != a)
                 return false;
 
             byte evalZ = (byte)(f >> 7 & 0x1);
@@ -103,16 +116,16 @@ namespace GBASharp
             byte evalH = (byte)(f >> 5 & 0x1);
             byte evalC = (byte)(f >> 4 & 0x1);
 
-            if (evalZ != flag_z)
+            if (evalZ != Flag_Z)
                 return false;
 
-            if (evalN != flag_n)
+            if (evalN != Flag_N)
                 return false;
 
-            if (evalH != flag_h)
+            if (evalH != Flag_H)
                 return false;
 
-            if (evalC != flag_c)
+            if (evalC != Flag_C)
                 return false;
 
             if (reg_bc != (ushort)(b << 8 | c))
@@ -162,7 +175,7 @@ namespace GBASharp
                 case 3: return CPU.E_Register;
                 case 4: return CPU.H_Register;
                 case 5: return CPU.L_Register;
-                case 7: return CPU.reg_a;
+                case 7: return CPU.A_Register;
                 default: return 0x0;
                     //throw new Exception("(HL) not handled here");
             }
@@ -178,7 +191,7 @@ namespace GBASharp
                 case 3: CPU.E_Register = newValue; break;
                 case 4: CPU.H_Register = newValue; break;
                 case 5: CPU.L_Register = newValue; break;
-                case 7: CPU.reg_a = newValue; break;
+                case 7: CPU.A_Register = newValue; break;
                 default: break;
                     //throw new Exception("(HL) not handled here");
             }
@@ -257,9 +270,9 @@ namespace GBASharp
 
         static void BIT(int bit, byte reg)
         {
-            CPU.flag_z = (byte)(((reg >> bit) & 1) == 0 ? 1 : 0);
-            CPU.flag_n = 0;
-            CPU.flag_h = 1;
+            CPU.Flag_Z = (byte)(((reg >> bit) & 1) == 0 ? 1 : 0);
+            CPU.Flag_N = 0;
+            CPU.Flag_H = 1;
         }
 
         static byte RES(int bit, byte reg)
@@ -281,7 +294,7 @@ namespace GBASharp
             }
 
             if (CPU.pc == 0x0067)
-                Console.WriteLine($"A={CPU.reg_a:X2}, LY={CPU.memory[0xFF44]}, FlagC={CPU.flag_c:X2} FlagZ={CPU.flag_z:X2} FlagH={CPU.flag_h:X2} FlagN={CPU.flag_n:X2}");
+                Console.WriteLine($"A={CPU.A_Register:X2}, LY={CPU.memory[0xFF44]}, FlagF={CPU.F_Register:X2}");
 
             switch (opcode)
             {
