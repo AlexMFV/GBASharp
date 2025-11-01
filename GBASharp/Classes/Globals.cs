@@ -12,7 +12,7 @@ namespace GBASharp
 
         public static int SCREEN_WIDTH = 160;
         public static int SCREEN_HEIGHT = 144;
-        public static int SCREEN_SCALE = 2;
+        public static int SCREEN_SCALE = 4;
 
         public static int SCREEN_DEBUG_WIDTH = SCREEN_WIDTH * 2;
         public static int SCREEN_DEBUG_HEIGHT = SCREEN_HEIGHT;

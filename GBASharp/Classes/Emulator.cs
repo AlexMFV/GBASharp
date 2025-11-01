@@ -60,24 +60,14 @@ namespace GBASharp
                     ppuManager.UpdateCycles(cpuManager);
 
                     PPU.Process(cpuCycles);
-
-                    //int valor = rand.Next(0, 5);
-                    //switch(valor)
-                    //{
-                    //    case 0: Screen.FillScreen(new Color(255, 0, 0, 255)); break;
-                    //    case 1: Screen.FillScreen(new Color(0, 255, 0, 255)); break;
-                    //    case 2: Screen.FillScreen(new Color(0, 0, 255, 255)); break;
-                    //    case 3: Screen.FillScreen(new Color(255, 0, 255, 255)); break;
-                    //    case 4: Screen.FillScreen(new Color(0, 255, 255, 255)); break;
-                    //}
                 }
 
                 //Update the screen
                 Raylib.BeginDrawing();
                 //DrawDebugWindow();
-                Raylib.ClearBackground(Raylib.BLACK);
+                //Raylib.ClearBackground(Raylib.BLACK);
                 Screen.Render();
-                //Raylib.DrawFPS(10, 10); //Draws the FPS counter
+                Raylib.DrawFPS(10, 10); //Draws the FPS counter
                 //Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
                 //Raylib.DrawText("Can Process: " + cpuManager.canProcess, 10, 70, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
 

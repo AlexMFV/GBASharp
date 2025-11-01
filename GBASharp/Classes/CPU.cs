@@ -59,12 +59,12 @@ namespace GBASharp
 
         public static ushort AF_Register { get { return reg_af; } set { reg_af = value; } }
         public static byte A_Register { get { return GetHighByte(reg_af); } set { reg_af = SetHighByte(reg_af, value); } }
-        public static byte F_Register { get { return GetLowByte(reg_af); } set { reg_af = SetLowByte(reg_af, value); } }
+        public static byte F_Register { get { return (byte)(GetLowByte(reg_af) & 0xF0); } set { reg_af = SetLowByte(reg_af, (byte)(value & 0xF0)); } }
 
-        public static byte Flag_C { get { return (byte)(F_Register >> 4 & 0x1); } set { F_Register = (byte)((F_Register & 0xE0) + (value << 4)); } }
-        public static byte Flag_H { get { return (byte)(F_Register >> 5 & 0x1); } set { F_Register = (byte)((F_Register & 0xD0) + (value << 5)); } }
-        public static byte Flag_N { get { return (byte)(F_Register >> 6 & 0x1); } set { F_Register = (byte)((F_Register & 0xB0) + (value << 6)); } }
-        public static byte Flag_Z { get { return (byte)(F_Register >> 7 & 0x1); } set { F_Register = (byte)((F_Register & 0x70) + (value << 7)); } }
+        public static byte Flag_C { get { return (byte)(F_Register >> 4 & 0x1); } set { F_Register = (byte)((F_Register & 0xE0) | (value << 4)); } }
+        public static byte Flag_H { get { return (byte)(F_Register >> 5 & 0x1); } set { F_Register = (byte)((F_Register & 0xD0) | (value << 5)); } }
+        public static byte Flag_N { get { return (byte)(F_Register >> 6 & 0x1); } set { F_Register = (byte)((F_Register & 0xB0) | (value << 6)); } }
+        public static byte Flag_Z { get { return (byte)(F_Register >> 7 & 0x1); } set { F_Register = (byte)((F_Register & 0x70) | (value << 7)); } }
 
         private static byte GetLowByte(ushort register) { return (byte)(register & 0xff); }
         private static byte GetHighByte(ushort register) { return (byte)(register >> 8 & 0xff); }
@@ -96,9 +96,16 @@ namespace GBASharp
             //Flag_N = (byte)(f >> 6 & 0x1);
             //Flag_Z = (byte)(f >> 7 & 0x1);
 
-            reg_bc = (ushort)(b << 8 | c);
-            reg_de = (ushort)(d << 8 | e);
-            reg_hl = (ushort)(h << 8 | l);
+            B_Register = b;
+            C_Register = c;
+            D_Register = d;
+            E_Register = e;
+            H_Register = h;
+            L_Register = l;
+
+            //reg_bc = (ushort)(b << 8 | c);
+            //reg_de = (ushort)(d << 8 | e);
+            //reg_hl = (ushort)(h << 8 | l);
             reg_sp = sp;
             pc = _pc;
 
@@ -111,22 +118,25 @@ namespace GBASharp
             if(A_Register != a)
                 return false;
 
-            byte evalZ = (byte)(f >> 7 & 0x1);
-            byte evalN = (byte)(f >> 6 & 0x1);
-            byte evalH = (byte)(f >> 5 & 0x1);
-            byte evalC = (byte)(f >> 4 & 0x1);
-
-            if (evalZ != Flag_Z)
+            if (F_Register != f)
                 return false;
 
-            if (evalN != Flag_N)
-                return false;
-
-            if (evalH != Flag_H)
-                return false;
-
-            if (evalC != Flag_C)
-                return false;
+            //byte evalZ = (byte)(f >> 7 & 0x1);
+            //byte evalN = (byte)(f >> 6 & 0x1);
+            //byte evalH = (byte)(f >> 5 & 0x1);
+            //byte evalC = (byte)(f >> 4 & 0x1);
+            //
+            //if (evalZ != Flag_Z)
+            //    return false;
+            //
+            //if (evalN != Flag_N)
+            //    return false;
+            //
+            //if (evalH != Flag_H)
+            //    return false;
+            //
+            //if (evalC != Flag_C)
+            //    return false;
 
             if (reg_bc != (ushort)(b << 8 | c))
                 return false;
@@ -287,14 +297,14 @@ namespace GBASharp
 
         public static void ExecuteOpcode(byte opcode)
         {
-            if (CPU.opcode != 0x0)
-            {
-                Console.WriteLine("");
-                Console.Write($"{CPU.pc:X8} - OPCODE: 0x{CPU.opcode:X2} (SP: {CPU.reg_sp:X2})");
-            }
+            //if (CPU.opcode != 0x0)
+            //{
+            //    Console.WriteLine("");
+            //    Console.Write($"{CPU.pc:X8} - OPCODE: 0x{CPU.opcode:X2} (SP: {CPU.reg_sp:X2})");
+            //}
 
-            if (CPU.pc == 0x0067)
-                Console.WriteLine($"A={CPU.A_Register:X2}, LY={CPU.memory[0xFF44]}, FlagF={CPU.F_Register:X2}");
+            //if (CPU.pc == 0x0067)
+            //    Console.WriteLine($"A={CPU.A_Register:X2}, LY={CPU.memory[0xFF44]}, FlagF={CPU.F_Register:X4}");
 
             switch (opcode)
             {
@@ -637,7 +647,7 @@ namespace GBASharp
                 default: break;
             }
             
-            //pc += 0x1;
+            
         }
 
         #endregion

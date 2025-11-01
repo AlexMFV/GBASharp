@@ -896,18 +896,28 @@ namespace GBASharp
 
         public static void JR() { JR(0x0, ignore: true); }
 
+        //public static void JR(byte flag, bool expect = false, bool ignore = false)
+        //{
+        //    byte immediate = CPU.GetByteFromPC();
+        //    if (ignore || flag == (expect ? 0x1 : 0x0))
+        //    {
+        //        bool minus = immediate >= 0x80; //If less than 128
+        //
+        //        //Should return a value from -128 to 127 (255)
+        //        if (minus)
+        //            CPU.pc -= (byte)(0x80 - (immediate - 0x80));
+        //        else
+        //            CPU.pc += (byte)(immediate);
+        //    }
+        //}
+
         public static void JR(byte flag, bool expect = false, bool ignore = false)
         {
-            byte immediate = CPU.GetByteFromPC();
-            if (ignore || flag == (expect ? 0x1 : 0x0))
-            {
-                bool minus = immediate >= 0x80; //If less than 128
+            sbyte offset = (sbyte)CPU.GetByteFromPC();
 
-                //Should return a value from -128 to 127 (255)
-                if (minus)
-                    CPU.pc -= (byte)(0x80 - (immediate - 0x80));
-                else
-                    CPU.pc += (byte)(immediate);
+            if (ignore || flag == (expect ? (byte)1 : (byte)0))
+            {
+                CPU.pc = (ushort)(CPU.pc + offset);
             }
         }
 
@@ -1000,7 +1010,7 @@ namespace GBASharp
         public static void POPxAF()
         {
             CPU.A_Register = CPU.memory[CPU.reg_sp + 1];
-            CPU.F_Register = CPU.memory[CPU.reg_sp];
+            CPU.F_Register = (byte)(CPU.memory[CPU.reg_sp] & 0xf0);
             CPU.reg_sp += 0x2;
         }
 

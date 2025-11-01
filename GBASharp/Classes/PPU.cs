@@ -31,15 +31,15 @@ namespace GBASharp
         static byte reg_OBP0; //0xFF48
         static byte reg_OBP1; //0xFF49
 
-        static bool LCDC_bit0 = ((reg_LCDC & 0x1) == 0x1);
-        static bool LCDC_bit1 = ((reg_LCDC >> 1 & 0x1) == 0x1);
-        static bool LCDC_bit2 = ((reg_LCDC >> 2 & 0x1) == 0x1);
-        static bool LCDC_bit3 = ((reg_LCDC >> 3 & 0x1) == 0x1);
-        static bool LCDC_bit4 = ((reg_LCDC >> 4 & 0x1) == 0x1);
-        static bool LCDC_bit5 = ((reg_LCDC >> 5 & 0x1) == 0x1);
-        static bool LCDC_bit6 = ((reg_LCDC >> 6 & 0x1) == 0x1);
-        static bool LCDC_bit7 = ((reg_LCDC >> 7 & 0x1) == 0x1);
-        static bool LCDC_bit8 = ((reg_LCDC >> 8 & 0x1) == 0x1);
+        static bool LCDC_bit0 { get { return ((reg_LCDC & 0x1) == 0x1); } }
+        static bool LCDC_bit1 { get { return ((reg_LCDC >> 1 & 0x1) == 0x1); } }
+        static bool LCDC_bit2 { get { return ((reg_LCDC >> 2 & 0x1) == 0x1); } }
+        static bool LCDC_bit3 { get { return ((reg_LCDC >> 3 & 0x1) == 0x1); } }
+        static bool LCDC_bit4 { get { return ((reg_LCDC >> 4 & 0x1) == 0x1); } }
+        static bool LCDC_bit5 { get { return ((reg_LCDC >> 5 & 0x1) == 0x1); } }
+        static bool LCDC_bit6 { get { return ((reg_LCDC >> 6 & 0x1) == 0x1); } }
+        static bool LCDC_bit7 { get { return ((reg_LCDC >> 7 & 0x1) == 0x1); } }
+        static bool LCDC_bit8 { get { return ((reg_LCDC >> 8 & 0x1) == 0x1); } }
 
         static byte[] bg_framebuffer = new byte[256 * 256];
         static byte[] win_framebuffer = new byte[256 * 256];
@@ -175,6 +175,21 @@ namespace GBASharp
             //Otherwise if LCDC bit 4 is 0 then we use
             //$8800-$8fff (block 0) and $9000-$97ff (block 1)
 
+            // Read registers dynamically
+            reg_LCDC = CPU.memory[add_LCDC];
+            reg_SCY = CPU.memory[add_SCY];
+            reg_SCX = CPU.memory[add_SCX];
+            reg_BGP = CPU.memory[add_BGP];
+
+            // Check if BG/Window display is enabled (bit 0)
+            if (!LCDC_bit0)
+            {
+                // If background is disabled, draw white
+                if (scanline < 144 && scanline_pixel < 160)
+                    Screen.SetPixel(scanline, scanline_pixel, 0x0);
+                return;
+            }
+
             //Compute global pixel in terms of the whole 256x256 pixel background
             int bgY = (scanline + (int)reg_SCY) % 256;
             int bgX = (scanline_pixel + (int)reg_SCX) % 256;
@@ -183,39 +198,14 @@ namespace GBASharp
             int tileRow = bgY / 8; //Gets the index of the current 8x8 grid vertical block
 
             //Based on LCDC 3rd bit we read from different tile maps
-            int tilemap_start = 0x0;
-            int tilemap_end = 0x0;
-            if (LCDC_bit3) //bit 3 is 1
-            {
-                //If lcdc bit 3 is 1 we can read the bg_tilemap from address 0x9800 to 0x9bff
-                tilemap_start = 0x9800;
-                tilemap_end = 0x9bff;
-            }
-            else
-            {
-                //Otherwise we read from 0x9c00 to 0x9fff
-                tilemap_start = 0x9c00;
-                tilemap_end = 0x9fff;
-            }
+            int tilemap_start = LCDC_bit3 ? 0x9C00 : 0x9800;
 
             //Compute the ID of the tile to be read
             int tilemapIdx = tilemap_start + (tileRow * 32) + tileCol;
             int tileIdx = CPU.memory[tilemapIdx];
 
             //Based on LCDC bit 4 we either read from a signed value 0 to 255 or unsigned -128 to 127
-            int startTileAddr = 0x0;
-            if (LCDC_bit4)
-            {
-                //Unsigned from 0 to 255 tileId
-                startTileAddr = 0x8000;
-            }
-            else
-            {
-                //Signed from -128 to 127 tileId
-                startTileAddr = 0x9000;
-            }
-
-            int tileAddr = startTileAddr + tileIdx * 16;
+            int tileAddr = LCDC_bit4 ? 0x8000 + (tileIdx * 16) : 0x9000 + ((sbyte)tileIdx * 16);
 
             //Extract the information of the tile
             int tileRowY = bgY % 8;
@@ -229,20 +219,13 @@ namespace GBASharp
             int high = (highByte >> bitIndex) & 1;
             int colorID = (high << 1) | low;  // 0–3
 
-            byte color = 0x0;
-
-            switch (colorID)
-            {
-                case 0: color = 0x0; break;
-                case 1: color = 0x1; break;
-                case 2: color = 0x2; break;
-                case 3: color = 0x3; break;
-            }
+            // Apply palette (BGP register maps color IDs to actual colors)
+            int paletteColor = (reg_BGP >> (colorID * 2)) & 0x3;
 
             //Step 6 - Needs to be implemented, but can be skipped until bg scrolling is needed
 
-            if(scanline < 144)
-                Screen.SetPixel(scanline, scanline_pixel, color);
+            if (scanline < 144)
+                Screen.SetPixel(scanline, scanline_pixel, (byte)paletteColor);
         }
 
         public static void Mode0() { }
