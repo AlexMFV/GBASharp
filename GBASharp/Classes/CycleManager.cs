@@ -18,8 +18,8 @@ namespace GBASharp
             DEBUG_PREVIOUS_CYCLES = 0;
             MAX_CYCLES_FRAME = MAX_CYCLES;
             func = executeFunction;
-            double msPerFrame = 1000 / targetFPS;
-            cycleTimer = new Timer(msPerFrame);
+            double msPerFrame = 1000.0f / targetFPS;
+            cycleTimer = new Timer( msPerFrame);
         }
 
         public static double[] CYCLES_OPCODE =
@@ -50,7 +50,7 @@ namespace GBASharp
         {
             this.cycle += cycles;
             //Maybe try to find a way to make this more efficient, like a trigger (?)
-            if (canProcess && cycles >= MAX_CYCLES_FRAME)
+            if (canProcess && this.cycle >= MAX_CYCLES_FRAME)
                 canProcess = false; //Stops processing until the next frame
         }
 
@@ -60,9 +60,16 @@ namespace GBASharp
             UpdateCycles(0); //Refresh the canProcess flag
         }
 
-        private void CycleTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e) { func.Invoke(); }
+        private void CycleTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            func.Invoke();
+        }
 
-        public void Start() { cycleTimer.Start(); }
+        public void Start()
+        {
+            SetupTimer();
+            cycleTimer.Start();
+        }
 
         public void Stop() { cycleTimer.Stop(); }
     }

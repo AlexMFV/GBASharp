@@ -46,7 +46,8 @@ namespace GBASharp
             {
                 currCycle = 0;
 
-                while (currCycle < totalCycles) //cpuManager.canProcess || ppuManager.canProcess
+                //The emulator is not a bit slower, but it's still too fast
+                while (cpuManager.canProcess) //|| ppuManager.canProcess)
                 {
                     //Process opcodes for the duration of one frame
                     CPU.Fetch();
@@ -54,10 +55,10 @@ namespace GBASharp
                     CPU.Execute();
 
                     cpuCycles = CycleManager.CYCLES_OPCODE[CPU.opcode]; //Cycles used for the execution of the current instruction
-                    currCycle += cpuCycles; //Total number of cycles
+                    //currCycle += cpuCycles; //Total number of cycles
 
-                    cpuManager.UpdateCycles(CycleManager.CYCLES_OPCODE[CPU.opcode]);
-                    ppuManager.UpdateCycles(cpuManager);
+                    cpuManager.UpdateCycles(cpuCycles);
+                    //ppuManager.UpdateCycles(cpuManager);
 
                     PPU.Process(cpuCycles);
                 }
