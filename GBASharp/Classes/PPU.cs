@@ -41,6 +41,12 @@ namespace GBASharp
         static bool LCDC_bit7 { get { return ((reg_LCDC >> 7 & 0x1) == 0x1); } }
         static bool LCDC_bit8 { get { return ((reg_LCDC >> 8 & 0x1) == 0x1); } }
 
+        // Cache registers per scanline to avoid repeated memory reads
+        static byte cached_LCDC;
+        static byte cached_SCY;
+        static byte cached_SCX;
+        static byte cached_BGP;
+
         static byte[] bg_framebuffer = new byte[256 * 256];
         static byte[] win_framebuffer = new byte[256 * 256];
         //static byte[] sprite_framebuffer = new byte[256 * 256];
@@ -114,6 +120,12 @@ namespace GBASharp
                             mode3_cycles = 0;
                             scanline_pixel = -1;
                             startMode3 = false;
+
+                            // Cache registers at the start of Mode3 for this scanline
+                            cached_LCDC = CPU.memory[add_LCDC];
+                            cached_SCY = CPU.memory[add_SCY];
+                            cached_SCX = CPU.memory[add_SCX];
+                            cached_BGP = CPU.memory[add_BGP];
                         }
 
                         mode3_cycles++;
@@ -145,19 +157,19 @@ namespace GBASharp
             sprite_buffer.Clear(); //Buffer is per scanline
 
             //Goes through OAM
-            for(ushort i = oam_start; i <= oam_end; i+=0x4)
+            for (ushort i = oam_start; i <= oam_end; i+=0x4)
             {
                 //Checks the YPos of each sprite
                 //If y pos is the same level as scanline, we save the current sprite in the buffer (if buffer is full we ignore)
-                byte yPos = (byte)(CPU.memory[i] - 0x10);
+                byte yPos = (byte)(CPU.memory[i] - 16);
                 byte xPos = (byte)CPU.memory[i+0x1];
                 byte tileIdx = (byte)CPU.memory[i+0x2];
                 byte attrs = (byte)CPU.memory[i+0x3];
 
-                byte sprt_sz = (byte)(reg_LCDC & 0x100); //0 = 8x8 | 1 = 8x16
-                int size = sprt_sz == 0x0 ? 0x8 : 0x10; //8 or 16 pixels
+                //byte sprt_sz = (byte)(reg_LCDC & 0x100); //0 = 8x8 | 1 = 8x16
+                int size = !LCDC_bit2 ? 0x8 : 0x10; //8 or 16 pixels
 
-                if(scanline >= yPos && scanline <= yPos + size)
+                if(scanline >= yPos && scanline < yPos + size)
                 {
                     //Is present in current scanline
                     if (sprite_buffer.Count < 10)
@@ -191,8 +203,8 @@ namespace GBASharp
             }
 
             //Compute global pixel in terms of the whole 256x256 pixel background
-            int bgY = (scanline + (int)reg_SCY) % 256;
-            int bgX = (scanline_pixel + (int)reg_SCX) % 256;
+            int bgY = (scanline + cached_SCY) & 0xFF;  // Use bitwise AND for modulo 256
+            int bgX = (scanline_pixel + cached_SCX) & 0xFF;
 
             int tileCol = bgX / 8; //Gets the index of the current 8x8 grid horizontal block
             int tileRow = bgY / 8; //Gets the index of the current 8x8 grid vertical block

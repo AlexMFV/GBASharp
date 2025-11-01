@@ -693,8 +693,8 @@ namespace GBASharp
         {
             //Clear and Load ROMs
             ClearMemory();
-            LoadBootROM();
             LoadRomToMemory();
+            LoadBootROM();
         }
 
         public static void ClearMemory()
@@ -705,18 +705,16 @@ namespace GBASharp
 
         static void LoadBootROM()
         {
-            //The boot rom only loads the first 256 bytes
-            for (int i = 0x0; i <= 0xFF; i++)
+            // Boot ROM overlays the first 256 bytes
+            for (int i = 0x0; i < bootROM.Length && i <= 0xFF; i++)
                 memory[i] = bootROM[i];
         }
 
         static void LoadRomToMemory()
         {
-            //The rom should only be loaded after the boot rom is burned to memory (which is from 0x100 onward)
-
-            //The rom itself only loads the first 32KiB
-            for (int i = 0x0; i <= 0x7FFF; i++)
-                memory[0x100 + i] = Cartridge.ROM[i];
+            // Load ROM starting at 0x0000 (but boot ROM will overlay it temporarily)
+            for (int i = 0x0; i < Cartridge.ROM.Length && i <= 0x7FFF; i++)
+                memory[i] = Cartridge.ROM[i];
         }
 
         public static void Fetch()
