@@ -11,8 +11,8 @@ namespace GBASharp
     public static class CPU
     {
         //CPU Memory Map
-        public static byte[] memory = new byte[0xFFFF]; //64KiB Memory
-        public static byte[] bootROM = new byte[0x1FF]; //256b boot ROM
+        public static byte[] memory = new byte[0x10000]; //64KiB Memory
+        public static byte[] bootROM = new byte[0x100]; //256b boot ROM
 
         //Lower 8 bits of the "reg_af" have the following flags
         //Bit 7 - Zero Flag (z)
@@ -34,12 +34,23 @@ namespace GBASharp
         public static ushort pc = 0x0;     //Program Counter
 
         public static byte opcode = 0x0;
+        public static bool IME = false;
+        public static int IMEshouldExecute = 0;
+        public static bool IMEchanged = false;
+        public static bool bootFinished = false;
+        public static bool halted = false;
 
         //Helpers opcode (DXY0)
         public static byte op_Prefix = 0x0;
         public static byte op_X = 0x0;
         public static byte op_Y = 0x0;
         public static byte op_N = 0x0;
+
+        public static ushort ifAddress = 0xff0f;
+        public static ushort ieAddress = 0xffff;
+
+        public static byte IFRegister { get { return memory[ifAddress]; } }
+        public static byte IERegister { get { return memory[ieAddress]; } }
 
         //public static bool CanProcess { get { return canProcess; } set { canProcess = value; } }
         //public static double Cycles { get { return cycles; } set { cycles = value; } }
@@ -299,8 +310,8 @@ namespace GBASharp
         {
             //if (CPU.opcode != 0x0)
             //{
-            //    Console.WriteLine("");
-            //    Console.Write($"{CPU.pc:X8} - OPCODE: 0x{CPU.opcode:X2} (SP: {CPU.reg_sp:X2})");
+            //Console.WriteLine("");
+            //Console.Write($"{CPU.pc:X8} - OPCODE: 0x{CPU.opcode:X2} (SP: {CPU.reg_sp:X2})");
             //}
 
             //if (CPU.pc == 0x0067)
@@ -646,8 +657,16 @@ namespace GBASharp
 
                 default: break;
             }
-            
-            
+
+            if (IMEchanged && IMEshouldExecute == 0)
+            {
+                IME = true;
+                IMEchanged = false;
+            }
+
+            if (IMEchanged && IMEshouldExecute > 0)
+                IMEshouldExecute--;
+
         }
 
         #endregion
@@ -695,6 +714,12 @@ namespace GBASharp
             ClearMemory();
             LoadRomToMemory();
             LoadBootROM();
+        }
+
+        public static void UnmapBootRom()
+        {
+            for(int i = 0x0; i < bootROM.Length-1; i++)
+                memory[i] = Cartridge.ROM[i];
         }
 
         public static void ClearMemory()

@@ -83,10 +83,10 @@ namespace GBASharp
                         //11 - color 3
                         switch (pixelBuffer[pix])
                         {
-                            case 0x0: Raylib.DrawPixel(pixelX, pixelY, Raylib.WHITE); break;
-                            case 0x1: Raylib.DrawPixel(pixelX, pixelY, Raylib.LIGHTGRAY); break;
-                            case 0x2: Raylib.DrawPixel(pixelX, pixelY, Raylib.DARKGRAY); break;
-                            case 0x3: Raylib.DrawPixel(pixelX, pixelY, Raylib.BLACK); break;
+                            case 0x0: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(155, 188, 15, 255)); break;
+                            case 0x1: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(139, 172, 15, 255)); break;
+                            case 0x2: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(48, 98, 48, 255)); break;
+                            case 0x3: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(15, 56, 15, 255)); break;
                         }
                     }
                 }

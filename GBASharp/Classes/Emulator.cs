@@ -7,11 +7,13 @@ namespace GBASharp
     {
         public static CycleManager cpuManager;
         public static CycleManager ppuManager;
+        public static bool stopped = false;
+        public static bool runOnce = false;
 
         public static void Setup()
         {
             RomLoader.LoadBootRom("dmg_boot.bin");
-            RomLoader.LoadRom("tetris.gb");
+            RomLoader.LoadRom("drmario.gb");
             CPU.BootSequence();
             PPU.InitRegisters();
             cpuManager = new CycleManager(CPU.ResetCycleCounter);
@@ -46,21 +48,51 @@ namespace GBASharp
             {
                 currCycle = 0;
 
-                //The emulator is not a bit slower, but it's still too fast
-                while (cpuManager.canProcess) //|| ppuManager.canProcess)
+                if (stopped && Raylib.IsKeyReleased(KeyboardKey.KEY_N))
+                    runOnce = true;
+
+                if (Raylib.IsKeyReleased(KeyboardKey.KEY_SPACE))
+                    stopped = !stopped;
+
+                if (!stopped || runOnce)
                 {
-                    //Process opcodes for the duration of one frame
-                    CPU.Fetch();
-                    CPU.Decode();
-                    CPU.Execute();
+                    //The emulator is not a bit slower, but it's still too fast
+                    while (cpuManager.canProcess) //|| ppuManager.canProcess)
+                    {
+                        if (!CPU.halted)
+                        {
+                            //Process opcodes for the duration of one frame
+                            CPU.Fetch();
+                            CPU.Decode();
+                            CPU.Execute();
+                        }
+                        else
+                        {
+                            if((CPU.IFRegister & CPU.IERegister) != 0) //If any of the interrupts are triggered
+                            {
+                                CPU.halted = false; //wake up CPU
+                                if (CPU.IME)
+                                    HandleInterrupt();
+                            }
+                        }
 
-                    cpuCycles = CycleManager.CYCLES_OPCODE[CPU.opcode]; //Cycles used for the execution of the current instruction
-                    //currCycle += cpuCycles; //Total number of cycles
+                        cpuCycles = CycleManager.CYCLES_OPCODE[CPU.opcode]; //Cycles used for the execution of the current instruction
+                                                                            //currCycle += cpuCycles; //Total number of cycles
 
-                    cpuManager.UpdateCycles(cpuCycles);
-                    //ppuManager.UpdateCycles(cpuManager);
+                        cpuManager.UpdateCycles(cpuCycles);
+                        //ppuManager.UpdateCycles(cpuManager);
 
-                    PPU.Process(cpuCycles);
+                        PPU.Process(cpuCycles);
+
+                        if (runOnce)
+                            runOnce = false;
+                    }
+                }
+
+                if (CPU.bootFinished)
+                {
+                    CPU.bootFinished = false; //So that this does not run every time, we just need it to run once
+                    CPU.UnmapBootRom();
                 }
 
                 //Update the screen
@@ -68,6 +100,13 @@ namespace GBASharp
                 //DrawDebugWindow();
                 //Raylib.ClearBackground(Raylib.BLACK);
                 Screen.Render();
+                if (stopped)
+                {
+                    Raylib.DrawText($"Stopped!", 10, 35, 20, new Raylib_CsLo.Color(255,0,0,255));
+                    Raylib.DrawText($"RunOnce: {runOnce}", 10, 60, 20, new Raylib_CsLo.Color(255, 0, 0, 255));
+                    Raylib.DrawText($"OPCODE: Ox{CPU.opcode:X2}", 10, 85, 20, new Raylib_CsLo.Color(255, 0, 0, 255));
+                    Raylib.DrawText($"AF: {CPU.AF_Register:X4} BC: {CPU.BC_Register:X4} DE: {CPU.DE_Register:X4} HL: {CPU.HL_Register:X4}", 10, 110, 20, new Raylib_CsLo.Color(255, 0, 0, 255));
+                }
                 Raylib.DrawFPS(10, 10); //Draws the FPS counter
                 //Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
                 //Raylib.DrawText("Can Process: " + cpuManager.canProcess, 10, 70, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
@@ -75,6 +114,13 @@ namespace GBASharp
                 //Screen.ProcessScanline(PPU.scanline);
                 Raylib.EndDrawing();
             }
+        }
+
+        private static void HandleInterrupt()
+        {
+            //For now do nothing, need to implement interrupt handling
+            //Also the problem with Dr Mario is that MBC is not implemented (memory bank controller)
+            return;
         }
 
         private static void DrawDebugWindow()
