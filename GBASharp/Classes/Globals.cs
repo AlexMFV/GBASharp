@@ -32,7 +32,7 @@ namespace GBASharp
         public static int DEBUG_RECTANGLE_WIDTH = Globals.EMULATOR_OFFSET_X - (SCALED_PADDING_OFFSET * 2); //Compute debug window size X
         public static int DEBUG_RECTANGLE_HEIGHT = Globals.REAL_SCREEN_HEIGHT - (SCALED_PADDING_OFFSET * 2); //Compute debug window size Y
 
-        public static int FONT_SIZE = 10;
+        public static int FONT_SIZE = 16;
         public static int SCALED_FONT_SIZE = FONT_SIZE * SCREEN_SCALE;
     }
 }

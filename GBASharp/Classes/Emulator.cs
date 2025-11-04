@@ -1,4 +1,6 @@
-﻿using Raylib_CsLo;
+﻿using GBASharp.Classes;
+using Raylib_CsLo;
+using System.Numerics;
 using System.Timers;
 
 namespace GBASharp
@@ -13,6 +15,7 @@ namespace GBASharp
         public static List<ushort> opcode_history = new List<ushort>();
         public static int histMaxIdx = 25;
         public static int maxHist = 256;
+        public static Font debugFont;
 
         public static void Setup()
         {
@@ -25,6 +28,17 @@ namespace GBASharp
 
             cpuManager.Start();
             ppuManager.Start();
+
+            //Setup test
+            if (Globals.DEBUG)
+            {
+                //Load BoldPixels
+                unsafe
+                {
+                    debugFont = Raylib.LoadFontEx("Fonts/BoldPixels.ttf", Globals.SCALED_FONT_SIZE, null, 250);
+                }
+                Raylib.SetTextureFilter(debugFont.texture, TextureFilter.TEXTURE_FILTER_POINT);
+            }
         }
 
         public static void MainLoop()
@@ -113,9 +127,11 @@ namespace GBASharp
 
                 //Update the screen
                 Raylib.BeginDrawing();
+
                 DrawDebugWindow();
-                //Raylib.ClearBackground(Raylib.BLACK);
+                
                 Screen.Render();
+
                 if (stopped)
                 {
                     //TODO: When debugging enabled change the position of this to the middle of the screen, on the blank space
@@ -150,40 +166,57 @@ namespace GBASharp
                 //Right Debug bar for opcode
                 Raylib.DrawRectangle(Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + Globals.SCALED_PADDING_OFFSET, Globals.SCALED_PADDING_OFFSET, Globals.DEBUG_RECTANGLE_WIDTH, Globals.DEBUG_RECTANGLE_HEIGHT, Raylib.DARKPURPLE);
 
+                List<string> pcoptexts = new List<string>();
+
                 if (pc_history.Count < maxHist)
                 {
                     for (int i = 0; i < histMaxIdx /*pc_history.Count*/; i++)
                     {
-                        Raylib.DrawText($"{pc_history[i]:X2} ({opcode_history[i]:X2})", Globals.SCALED_PADDING_OFFSET + (Globals.SCALED_PADDING_OFFSET / 2), (Globals.SCALED_PADDING_OFFSET * 2) + (i * Globals.SCALED_PADDING_OFFSET), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                        //Raylib.DrawText($"{pc_history[i]:X2} ({opcode_history[i]:X2})", Globals.SCALED_PADDING_OFFSET + (Globals.SCALED_PADDING_OFFSET / 2), (Globals.SCALED_PADDING_OFFSET * 2) + (i * Globals.SCALED_PADDING_OFFSET), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                        pcoptexts.Add($"{pc_history[i]:X4} ({opcode_history[i]:X2})");
                     }
                 }
                 else
                 {
                     for (int i = pc_history.Count - histMaxIdx; i < pc_history.Count /*pc_history.Count*/; i++)
                     {
-                        Raylib.DrawText($"{pc_history[i]:X2} ({opcode_history[i]:X2})", Globals.SCALED_PADDING_OFFSET + (Globals.SCALED_PADDING_OFFSET / 2), (Globals.SCALED_PADDING_OFFSET * 2) + ((pc_history.Count - i - 1) * Globals.SCALED_PADDING_OFFSET), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                        //Raylib.DrawText($"{pc_history[i]:X2} ({opcode_history[i]:X2})", Globals.SCALED_PADDING_OFFSET + (Globals.SCALED_PADDING_OFFSET / 2), (Globals.SCALED_PADDING_OFFSET * 2) + ((pc_history.Count - i - 1) * Globals.SCALED_PADDING_OFFSET), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                        pcoptexts.Add($"{pc_history[i]:X4} ({opcode_history[i]:X2})");
                     }
-                }
+                }               
 
-                Raylib.DrawText($"AF:{CPU.AF_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"BC:{CPU.BC_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET*2), (Globals.SCALED_PADDING_OFFSET * 2) * 2, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"DE:{CPU.DE_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET*2), (Globals.SCALED_PADDING_OFFSET * 2) * 3, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"HL:{CPU.HL_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET*2), (Globals.SCALED_PADDING_OFFSET * 2) * 4, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                //Draw on the left rectangle
+                debugFont.DrawDebugTexts(pcoptexts, true);
 
-                Raylib.DrawText($"A:{CPU.A_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 5, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"F:{CPU.F_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 6, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"B:{CPU.B_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 7, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"C:{CPU.C_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 8, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"D:{CPU.D_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 9, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"E:{CPU.E_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 10, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"H:{CPU.H_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 11, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
-                Raylib.DrawText($"L:{CPU.L_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 12, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                //Draw on the right rectangle
+                debugFont.DrawDebugTexts(new string[]
+                {
+                    $"PC: {CPU.pc:X4}",
+                    "",
+                    $"SP: {CPU.reg_sp:X4}",
+                    "",
+                    $"IME: {(CPU.IME ? 1 : 0)}",
+                    "",
+                    $"Halted: {(CPU.halted ? 1 : 0)}",
+                    "",
+                    $"Opcode: {CPU.opcode:X2}",
+                    "",
+                    $"Cycles: {cpuManager.DEBUG_PREVIOUS_CYCLES}",
+                    "",
+                    $"AF: {CPU.AF_Register:X4}",
+                    "",
+                    $"BC: {CPU.BC_Register:X4}",
+                    "",
+                    $"DE: {CPU.DE_Register:X4}",
+                    "",
+                    $"HL: {CPU.HL_Register:X4}"
+                }, false);
             }
         }
 
         private static void AddPCtoHistory()
         {
-            //If list is still not filled
+             //If list is still not filled
             //if (pc_history.Count < histMaxIdx)
             //    pc_history.Add(CPU.pc);
             //else
