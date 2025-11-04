@@ -9,8 +9,8 @@ namespace GBASharp
         public static byte[] framebufferAlpha = new byte[Globals.SCREEN_WIDTH * Globals.SCREEN_HEIGHT * 4];    //Used for alpha screens (Window and Sprite screen)
         public static byte[] pixelBuffer = new byte[Globals.SCREEN_WIDTH * Globals.SCREEN_HEIGHT];
 
-        public static int pixelScaleX = Globals.REAL_SCREEN_WIDTH / Globals.SCREEN_WIDTH;
-        public static int pixelScaleY = Globals.REAL_SCREEN_HEIGHT / Globals.SCREEN_HEIGHT;
+        public static int pixelScaleX = Globals.EMULATOR_WIDTH / Globals.SCREEN_WIDTH;
+        public static int pixelScaleY = Globals.EMULATOR_HEIGHT / Globals.SCREEN_HEIGHT;
 
         private static int currentScanline = 0;
         private static int maxScanlines = 156; //Total number of scanlines
@@ -83,10 +83,10 @@ namespace GBASharp
                         //11 - color 3
                         switch (pixelBuffer[pix])
                         {
-                            case 0x0: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(155, 188, 15, 255)); break;
-                            case 0x1: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(139, 172, 15, 255)); break;
-                            case 0x2: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(48, 98, 48, 255)); break;
-                            case 0x3: Raylib.DrawPixel(pixelX, pixelY, new Raylib_CsLo.Color(15, 56, 15, 255)); break;
+                            case 0x0: Raylib.DrawPixel(pixelX + Globals.EMULATOR_OFFSET_X, pixelY + Globals.EMULATOR_OFFSET_Y, new Raylib_CsLo.Color(155, 188, 15, 255)); break;
+                            case 0x1: Raylib.DrawPixel(pixelX + Globals.EMULATOR_OFFSET_X, pixelY + Globals.EMULATOR_OFFSET_Y, new Raylib_CsLo.Color(139, 172, 15, 255)); break;
+                            case 0x2: Raylib.DrawPixel(pixelX + Globals.EMULATOR_OFFSET_X, pixelY + Globals.EMULATOR_OFFSET_Y, new Raylib_CsLo.Color(48, 98, 48, 255)); break;
+                            case 0x3: Raylib.DrawPixel(pixelX + Globals.EMULATOR_OFFSET_X, pixelY + Globals.EMULATOR_OFFSET_Y, new Raylib_CsLo.Color(15, 56, 15, 255)); break;
                         }
                     }
                 }

@@ -8,7 +8,11 @@ namespace GBASharp
         public static CycleManager cpuManager;
         public static CycleManager ppuManager;
         public static bool stopped = false;
-        public static bool runOnce = false;
+        public static int runXTimes = 0;
+        public static List<ushort> pc_history = new List<ushort>();
+        public static List<ushort> opcode_history = new List<ushort>();
+        public static int histMaxIdx = 25;
+        public static int maxHist = 256;
 
         public static void Setup()
         {
@@ -49,15 +53,21 @@ namespace GBASharp
                 currCycle = 0;
 
                 if (stopped && Raylib.IsKeyReleased(KeyboardKey.KEY_N))
-                    runOnce = true;
+                    runXTimes = 1;
+
+                if (stopped && Raylib.GetMouseWheelMove() > 0)
+                    runXTimes = 512;
+
+                if (stopped && Raylib.GetMouseWheelMove() < 0)
+                    runXTimes = 5120;
 
                 if (Raylib.IsKeyReleased(KeyboardKey.KEY_SPACE))
                     stopped = !stopped;
 
-                if (!stopped || runOnce)
+                if (!stopped || runXTimes > 0)
                 {
                     //The emulator is not a bit slower, but it's still too fast
-                    while (cpuManager.canProcess) //|| ppuManager.canProcess)
+                    while ((cpuManager.canProcess && !stopped) || (stopped && runXTimes > 0)) //|| ppuManager.canProcess)
                     {
                         if (!CPU.halted)
                         {
@@ -65,6 +75,12 @@ namespace GBASharp
                             CPU.Fetch();
                             CPU.Decode();
                             CPU.Execute();
+
+                            if (Globals.DEBUG)
+                            {
+                                AddPCtoHistory();
+                                AddOpcodeToHistory();
+                            }
                         }
                         else
                         {
@@ -84,8 +100,8 @@ namespace GBASharp
 
                         PPU.Process(cpuCycles);
 
-                        if (runOnce)
-                            runOnce = false;
+                        if (runXTimes > 0)
+                            runXTimes--;
                     }
                 }
 
@@ -97,15 +113,13 @@ namespace GBASharp
 
                 //Update the screen
                 Raylib.BeginDrawing();
-                //DrawDebugWindow();
+                DrawDebugWindow();
                 //Raylib.ClearBackground(Raylib.BLACK);
                 Screen.Render();
                 if (stopped)
                 {
+                    //TODO: When debugging enabled change the position of this to the middle of the screen, on the blank space
                     Raylib.DrawText($"Stopped!", 10, 35, 20, new Raylib_CsLo.Color(255,0,0,255));
-                    Raylib.DrawText($"RunOnce: {runOnce}", 10, 60, 20, new Raylib_CsLo.Color(255, 0, 0, 255));
-                    Raylib.DrawText($"OPCODE: Ox{CPU.opcode:X2}", 10, 85, 20, new Raylib_CsLo.Color(255, 0, 0, 255));
-                    Raylib.DrawText($"AF: {CPU.AF_Register:X4} BC: {CPU.BC_Register:X4} DE: {CPU.DE_Register:X4} HL: {CPU.HL_Register:X4}", 10, 110, 20, new Raylib_CsLo.Color(255, 0, 0, 255));
                 }
                 Raylib.DrawFPS(10, 10); //Draws the FPS counter
                 //Raylib.DrawText("Cycles per Frame: " + cpuManager.DEBUG_PREVIOUS_CYCLES, 10, 40, 20, new Color(255, 0, 0, 255)); //Draws the FPS counter
@@ -127,7 +141,76 @@ namespace GBASharp
         {
             if (Globals.DEBUG)
             {
-                Raylib.DrawRectangle(Globals.REAL_SCREEN_WIDTH / 2, 0, Globals.REAL_SCREEN_WIDTH / 2, Globals.REAL_SCREEN_HEIGHT, new Color(0,0,0,1));
+                //Fill Background
+                Screen.FillScreen(Raylib.PURPLE, true);
+
+                //Left Debug bar for opcode
+                Raylib.DrawRectangle(Globals.SCALED_PADDING_OFFSET, Globals.SCALED_PADDING_OFFSET, Globals.DEBUG_RECTANGLE_WIDTH, Globals.DEBUG_RECTANGLE_HEIGHT, Raylib.DARKPURPLE);
+
+                //Right Debug bar for opcode
+                Raylib.DrawRectangle(Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + Globals.SCALED_PADDING_OFFSET, Globals.SCALED_PADDING_OFFSET, Globals.DEBUG_RECTANGLE_WIDTH, Globals.DEBUG_RECTANGLE_HEIGHT, Raylib.DARKPURPLE);
+
+                if (pc_history.Count < maxHist)
+                {
+                    for (int i = 0; i < histMaxIdx /*pc_history.Count*/; i++)
+                    {
+                        Raylib.DrawText($"{pc_history[i]:X2} ({opcode_history[i]:X2})", Globals.SCALED_PADDING_OFFSET + (Globals.SCALED_PADDING_OFFSET / 2), (Globals.SCALED_PADDING_OFFSET * 2) + (i * Globals.SCALED_PADDING_OFFSET), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                    }
+                }
+                else
+                {
+                    for (int i = pc_history.Count - histMaxIdx; i < pc_history.Count /*pc_history.Count*/; i++)
+                    {
+                        Raylib.DrawText($"{pc_history[i]:X2} ({opcode_history[i]:X2})", Globals.SCALED_PADDING_OFFSET + (Globals.SCALED_PADDING_OFFSET / 2), (Globals.SCALED_PADDING_OFFSET * 2) + ((pc_history.Count - i - 1) * Globals.SCALED_PADDING_OFFSET), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                    }
+                }
+
+                Raylib.DrawText($"AF:{CPU.AF_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2), Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"BC:{CPU.BC_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET*2), (Globals.SCALED_PADDING_OFFSET * 2) * 2, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"DE:{CPU.DE_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET*2), (Globals.SCALED_PADDING_OFFSET * 2) * 3, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"HL:{CPU.HL_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET*2), (Globals.SCALED_PADDING_OFFSET * 2) * 4, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+
+                Raylib.DrawText($"A:{CPU.A_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 5, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"F:{CPU.F_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 6, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"B:{CPU.B_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 7, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"C:{CPU.C_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 8, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"D:{CPU.D_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 9, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"E:{CPU.E_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 10, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"H:{CPU.H_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 11, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+                Raylib.DrawText($"L:{CPU.L_Register:X2}", Globals.EMULATOR_OFFSET_X + Globals.EMULATOR_WIDTH + (Globals.SCALED_PADDING_OFFSET * 2), (Globals.SCALED_PADDING_OFFSET * 2) * 12, Globals.SCALED_FONT_SIZE, Raylib.BLACK);
+            }
+        }
+
+        private static void AddPCtoHistory()
+        {
+            //If list is still not filled
+            //if (pc_history.Count < histMaxIdx)
+            //    pc_history.Add(CPU.pc);
+            //else
+            //{
+            //    pc_history.Add(CPU.pc); //Appends to end
+            //    pc_history.RemoveAt(0); //Removes first in the list
+            //}
+
+            //If list is still not filled
+            if (pc_history.Count < maxHist)
+                pc_history.Add(CPU.pc);
+            else
+            {
+                pc_history.Add(CPU.pc); //Appends to end
+                pc_history.RemoveAt(0); //Removes first in the list
+            }
+        }
+
+        private static void AddOpcodeToHistory()
+        {
+            //If list is still not filled
+            if (opcode_history.Count < maxHist)
+                opcode_history.Add(CPU.opcode);
+            else
+            {
+                opcode_history.Add(CPU.opcode); //Appends to end
+                opcode_history.RemoveAt(0); //Removes first in the list
             }
         }
     }
