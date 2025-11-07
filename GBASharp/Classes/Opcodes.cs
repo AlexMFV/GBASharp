@@ -269,7 +269,7 @@ namespace GBASharp
         public static void Code0xC1() { OpcodeHelpers.POPxBC(); }
         public static void Code0xC2() { OpcodeHelpers.JPxNZ(); }
         public static void Code0xC3() { OpcodeHelpers.JP(); }
-        public static void Code0xC4() { Console.WriteLine("(C4 Not Implemented)"); }
+        public static void Code0xC4() { OpcodeHelpers.CALLxZ(false); }
         public static void Code0xC5() { OpcodeHelpers.PUSH(CPU.B_Register, CPU.C_Register); }
         public static void Code0xC6() { OpcodeHelpers.ADD(CPU.GetByteFromPC()); }
         public static void Code0xC7() { OpcodeHelpers.RST(0); }
@@ -277,7 +277,7 @@ namespace GBASharp
         public static void Code0xC9() { OpcodeHelpers.RET(); }
         public static void Code0xCA() { OpcodeHelpers.JPxZ(); }
         public static void Code0xCB() { OpcodeHelpers.PREFIX(); }
-        public static void Code0xCC() { Console.WriteLine("(CC Not Implemented)"); }
+        public static void Code0xCC() { OpcodeHelpers.CALLxZ(true); }
         public static void Code0xCD() { OpcodeHelpers.CALL(); }
         public static void Code0xCE() { OpcodeHelpers.ADC(CPU.GetByteFromPC()); }
         public static void Code0xCF() { OpcodeHelpers.RST(1); }
@@ -290,7 +290,7 @@ namespace GBASharp
         public static void Code0xD1() { OpcodeHelpers.POPxDE(); }
         public static void Code0xD2() { OpcodeHelpers.JPxNC(); }
         public static void Code0xD3() { Console.WriteLine("(D3 Not Implemented)"); }
-        public static void Code0xD4() { Console.WriteLine("(D4 Not Implemented)"); }
+        public static void Code0xD4() { OpcodeHelpers.CALLxC(false); }
         public static void Code0xD5() { OpcodeHelpers.PUSH(CPU.D_Register, CPU.E_Register); }
         public static void Code0xD6() { OpcodeHelpers.SUB(CPU.GetByteFromPC()); }
         public static void Code0xD7() { OpcodeHelpers.RST(2); }
@@ -298,7 +298,7 @@ namespace GBASharp
         public static void Code0xD9() { OpcodeHelpers.RETI(); }
         public static void Code0xDA() { OpcodeHelpers.JPxC(); }
         public static void Code0xDB() { Console.WriteLine("(DB Not Implemented)"); }
-        public static void Code0xDC() { Console.WriteLine("(DC Not Implemented)"); }
+        public static void Code0xDC() { OpcodeHelpers.CALLxC(true); }
         public static void Code0xDD() { Console.WriteLine("(DD Not Implemented)"); }
         public static void Code0xDE() { OpcodeHelpers.SBC(CPU.GetByteFromPC()); }
         public static void Code0xDF() { OpcodeHelpers.RST(3); }
@@ -321,7 +321,7 @@ namespace GBASharp
         public static void Code0xEB() { Console.WriteLine("(EB Not Implemented)"); }
         public static void Code0xEC() { Console.WriteLine("(EC Not Implemented)"); }
         public static void Code0xED() { Console.WriteLine("(ED Not Implemented)"); }
-        public static void Code0xEE() { Console.WriteLine("(EE Not Implemented)"); }
+        public static void Code0xEE() { OpcodeHelpers.XOR(CPU.GetByteFromPC()); }
         public static void Code0xEF() { OpcodeHelpers.RST(5); }
 
         #endregion
@@ -334,7 +334,7 @@ namespace GBASharp
         public static void Code0xF3() { OpcodeHelpers.DI(); }
         public static void Code0xF4() { Console.WriteLine("(F4 Not Implemented)"); }
         public static void Code0xF5() { OpcodeHelpers.PUSHxAF(); }
-        public static void Code0xF6() { Console.WriteLine("(F6 Not Implemented)"); }
+        public static void Code0xF6() { OpcodeHelpers.OR(CPU.GetByteFromPC()); }
         public static void Code0xF7() { OpcodeHelpers.RST(6); }
         public static void Code0xF8() { Console.WriteLine("(F8 Not Implemented)"); }
         public static void Code0xF9() { OpcodeHelpers.LDxSP16(CPU.HL_Register); }
@@ -1076,20 +1076,42 @@ namespace GBASharp
         public static void CALL()
         {
             ushort word = CPU.GetWordFromPC();
-            CPU.reg_sp -= 0x1;
-            CPU.memory[CPU.reg_sp] = (byte)(CPU.pc >> 8);
-            CPU.reg_sp -= 0x1;
-            CPU.memory[CPU.reg_sp] = (byte)(CPU.pc);
+            PCtoStack();
             CPU.pc = word;
         }
 
         public static void CALL(byte address)
         {
+            PCtoStack();
+            CPU.pc = address;
+        }
+
+        public static void CALLxZ(bool condition)
+        {
+            ushort word = CPU.GetWordFromPC();
+            if (CPU.Flag_Z == (byte)(condition ? 0x1 : 0x0))
+            {
+                PCtoStack();
+                CPU.pc = word;
+            }
+        }
+
+        public static void CALLxC(bool condition)
+        {
+            ushort word = CPU.GetWordFromPC();
+            if (CPU.Flag_C == (byte)(condition ? 0x1 : 0x0))
+            {
+                PCtoStack();
+                CPU.pc = word;
+            }
+        }
+
+        public static void PCtoStack()
+        {
             CPU.reg_sp -= 0x1;
             CPU.memory[CPU.reg_sp] = (byte)(CPU.pc >> 8);
             CPU.reg_sp -= 0x1;
             CPU.memory[CPU.reg_sp] = (byte)(CPU.pc);
-            CPU.pc = address;
         }
 
         public static void RET(bool condition)

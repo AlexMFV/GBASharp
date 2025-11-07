@@ -49,6 +49,8 @@ namespace GBASharp
         public static ushort ifAddress = 0xff0f;
         public static ushort ieAddress = 0xffff;
 
+        public static ushort joypadAddress = 0xff00;
+
         public static byte IFRegister { get { return memory[ifAddress]; } }
         public static byte IERegister { get { return memory[ieAddress]; } }
 

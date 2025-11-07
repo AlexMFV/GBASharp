@@ -85,7 +85,14 @@ namespace GBASharp
             //Reached the end of the scanline (after HBlank)
             if (scanline_cycle >= 456)
             {
+                if (scanline == 144)
+                {
+                    //Check registers and other stuff
+                    CPU.memory[CPU.ifAddress] |= 0x01; //Set the VBlank Register
+                }
+
                 scanline++;
+
                 //Still need to understand where to put this (the boot will only advance if this is correct)
                 CPU.memory[0xFF44] = (byte)scanline; //Write the scanline to the register
 
@@ -244,11 +251,6 @@ namespace GBASharp
 
         public static void Mode1()
         {
-            if(scanline == 144)
-            {
-                //Check registers and other stuff
-            }
-
             //Reached the max scanlines
             if (scanline >= max_scanlines)
             {

@@ -9,7 +9,7 @@ namespace GBASharp
     public static class Globals
     {
         public static bool DEBUG = true;
-        public static bool SECOND_MONITOR = true;
+        public static bool SECOND_MONITOR = false;
 
         public static int SCREEN_WIDTH = 160;
         public static int SCREEN_HEIGHT = 144;
