@@ -105,7 +105,7 @@ namespace GBASharp
                             {
                                 CPU.halted = false; //wake up CPU
                                 if (CPU.IME)
-                                    HandleInterrupt();
+                                    CPU.HandleInterrupt();
                             }
                         }
 
@@ -147,68 +147,6 @@ namespace GBASharp
                 //Screen.ProcessScanline(PPU.scanline);
                 Raylib.EndDrawing();
             }
-        }
-
-        private static void HandleInterrupt()
-        {
-            CPU.IME = false; //Disable interrupts
-            OpcodeHelpers.PCtoStack(); //Adds the PC to the stack
-            int exec = GetLowestActiveBit();
-
-            if (exec == -1)
-                throw new Exception($"Error while processing Interrupt at PC:{CPU.pc} OP:{CPU.opcode}");
-
-            switch (exec)
-            {
-                case 0: CPU.pc = 0x0040; break;
-                case 1: CPU.pc = 0x0048; break;
-                case 2: CPU.pc = 0x0050; break;
-                case 3: CPU.pc = 0x0058; break;
-                case 4: CPU.pc = 0x0060; break;
-            }
-
-            //Also the problem with Dr Mario is that MBC is not implemented (memory bank controller)
-            return;
-        }
-
-        private static int GetLowestActiveBit()
-        {
-            //Bit 0 - VBlank
-            bool if_vblank = (byte)(CPU.IFRegister & 0x01) == 0x01;
-            bool ie_vblank = (byte)(CPU.IERegister & 0x01) == 0x01;
-
-            if (if_vblank && ie_vblank)
-                return 0;
-
-            //Bit 1 - LCD Stat
-            bool if_lcd = (byte)(CPU.IFRegister & 0x02) == 0x01;
-            bool ie_lcd = (byte)(CPU.IERegister & 0x02) == 0x01;
-
-            if (if_lcd && ie_lcd)
-                return 1;
-
-            //Bit 2 - Timer Overflow
-            bool if_timer = (byte)(CPU.IFRegister & 0x04) == 0x01;
-            bool ie_timer = (byte)(CPU.IERegister & 0x04) == 0x01;
-
-            if (if_timer && ie_timer)
-                return 2;
-
-            //Bit 3 - Serial Transfer
-            bool if_serial = (byte)(CPU.IFRegister & 0x08) == 0x01;
-            bool ie_serial = (byte)(CPU.IERegister & 0x08) == 0x01;
-
-            if (if_serial && ie_serial)
-                return 3;
-
-            //Bit 4 - Joypad Input
-            bool if_joypad = (byte)(CPU.IFRegister & 0x10) == 0x01;
-            bool ie_joypad = (byte)(CPU.IERegister & 0x10) == 0x01;
-
-            if (if_joypad && ie_joypad)
-                return 4;
-
-            return -1;
         }
 
         private static void DrawDebugWindow()

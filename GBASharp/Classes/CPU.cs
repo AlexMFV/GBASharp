@@ -51,8 +51,8 @@ namespace GBASharp
 
         public static ushort joypadAddress = 0xff00;
 
-        public static byte IFRegister { get { return memory[ifAddress]; } }
-        public static byte IERegister { get { return memory[ieAddress]; } }
+        public static byte IFRegister { get { return memory[ifAddress]; } set { memory[ifAddress] = value; } }
+        public static byte IERegister { get { return memory[ieAddress]; } set { memory[ifAddress] = value; } }
 
         //public static bool CanProcess { get { return canProcess; } set { canProcess = value; } }
         //public static double Cycles { get { return cycles; } set { cycles = value; } }
@@ -171,6 +171,102 @@ namespace GBASharp
                     return false;
 
             return true;
+        }
+
+        #endregion
+
+        public static void ResetCycleCounter() { Emulator.cpuManager.cycle = 0; Emulator.cpuManager.canProcess = true; }
+
+        //public static void IncrementCycleCounter(byte opcode)
+        //{
+            
+            //cycles += CycleManager.CYCLES_OPCODE[opcode];
+
+            //THERE WILL PROBABLY BE A PROBLEM HERE.
+            //LET'S SAY FOR EXAMPLE THAT WE ARE RUNNING CORRECTLY AND THE PROCESSING OF OPCODES IS ALWAYS FASTER THAT THE FRAME TIME.
+            //THIS MEANS THAT EVERY FRAME THE OPCODE PROCESSING WILL ALWAYS WAIT SOME TIME BEFORE RESUMING THE NEXT OPCODES, BECAUSE
+            //IT USED ALL THE CYCLES FOR THAT FRAME BEFORE THE FRAME ENDED.
+
+            //BUT LET'S SAY THAT THE 70k+ CYCLES ARE NOT ATTAINABLE INSIDE A FRAME, THIS MEANS THAT SOME INSTRUCTIONS THAT SHOULD'VE BEEN 
+            //PROCESSED IN THAT FRAME WILL BE PASSED TO THE NEXT FRAME. BUT THE WAY OUR CODE IS DONE WE ONLY REFRESH THE SCREEN USING RAYLIB
+            //ONCE WE STOP THE OPCODE PROCESSING.
+
+            //AND SINCE IN THIS SCENARIO WE NEVER FINISH THE OPCODES FIRST, THE CPU.CanProcess VARIABLE IS ALWAYS TRUE, MEANING THE WHILE LOOP
+            //IS NEVER GOING TO STOP.
+
+            //MAYBE IF WE INCLUDE THE OPCODE CYCLE INSIDE THE RAYLIB.BEGINDRAWING AND ENDDRAWING WE CAN PROCESS NEW DATA INSIDE THE WHILE LOOP
+
+        //}
+
+        public static ushort GetWordFromPC()
+        {
+            byte lower = GetByteFromPC();
+            byte upper = GetByteFromPC();
+            return (ushort)(upper << 8 | lower);
+        }
+
+        public static byte GetByteFromPC()
+        {
+            byte value = memory[pc];
+            pc += 0x1;
+            return value;
+        }
+
+        public static void BootSequence()
+        {
+            //Clear and Load ROMs
+            ClearMemory();
+            LoadRomToMemory();
+            LoadBootROM();
+        }
+
+        public static void UnmapBootRom()
+        {
+            for(int i = 0x0; i < bootROM.Length-1; i++)
+                memory[i] = Cartridge.ROM[i];
+        }
+
+        public static void ClearMemory()
+        {
+            for (int i = 0; i < memory.Length; i++)
+                memory[i] = 0x0;
+        }
+
+        static void LoadBootROM()
+        {
+            // Boot ROM overlays the first 256 bytes
+            for (int i = 0x0; i < bootROM.Length && i <= 0xFF; i++)
+                memory[i] = bootROM[i];
+        }
+
+        static void LoadRomToMemory()
+        {
+            // Load ROM starting at 0x0000 (but boot ROM will overlay it temporarily)
+            for (int i = 0x0; i < Cartridge.ROM.Length && i <= 0x7FFF; i++)
+                memory[i] = Cartridge.ROM[i];
+        }
+
+        public static void Fetch()
+        {
+            if (pc >= memory.Length)
+                pc = 0xFFFF-0x1;
+
+            opcode = memory[pc];
+            pc += 1;
+        }
+
+        public static void Decode()
+        {
+            //op_Prefix = (byte)(opcode >> 12 & 0xf);
+            //op_X = (byte)(opcode >> 8 & 0xf);
+            //op_Y = (byte)(opcode >> 4 & 0xf);
+            //op_N = (byte)(opcode & 0xf);
+        }
+
+        public static void Execute()
+        {
+            //ExecuteOpcode
+            ExecuteOpcode(opcode);
         }
 
         public static void ExecuteCBOpcode(byte opcode)
@@ -671,100 +767,71 @@ namespace GBASharp
 
         }
 
-        #endregion
-
-        public static void ResetCycleCounter() { Emulator.cpuManager.cycle = 0; Emulator.cpuManager.canProcess = true; }
-
-        //public static void IncrementCycleCounter(byte opcode)
-        //{
-            
-            //cycles += CycleManager.CYCLES_OPCODE[opcode];
-
-            //THERE WILL PROBABLY BE A PROBLEM HERE.
-            //LET'S SAY FOR EXAMPLE THAT WE ARE RUNNING CORRECTLY AND THE PROCESSING OF OPCODES IS ALWAYS FASTER THAT THE FRAME TIME.
-            //THIS MEANS THAT EVERY FRAME THE OPCODE PROCESSING WILL ALWAYS WAIT SOME TIME BEFORE RESUMING THE NEXT OPCODES, BECAUSE
-            //IT USED ALL THE CYCLES FOR THAT FRAME BEFORE THE FRAME ENDED.
-
-            //BUT LET'S SAY THAT THE 70k+ CYCLES ARE NOT ATTAINABLE INSIDE A FRAME, THIS MEANS THAT SOME INSTRUCTIONS THAT SHOULD'VE BEEN 
-            //PROCESSED IN THAT FRAME WILL BE PASSED TO THE NEXT FRAME. BUT THE WAY OUR CODE IS DONE WE ONLY REFRESH THE SCREEN USING RAYLIB
-            //ONCE WE STOP THE OPCODE PROCESSING.
-
-            //AND SINCE IN THIS SCENARIO WE NEVER FINISH THE OPCODES FIRST, THE CPU.CanProcess VARIABLE IS ALWAYS TRUE, MEANING THE WHILE LOOP
-            //IS NEVER GOING TO STOP.
-
-            //MAYBE IF WE INCLUDE THE OPCODE CYCLE INSIDE THE RAYLIB.BEGINDRAWING AND ENDDRAWING WE CAN PROCESS NEW DATA INSIDE THE WHILE LOOP
-
-        //}
-
-        public static ushort GetWordFromPC()
+        public static void HandleInterrupt()
         {
-            byte lower = GetByteFromPC();
-            byte upper = GetByteFromPC();
-            return (ushort)(upper << 8 | lower);
+            CPU.IME = false; //Disable interrupts
+            OpcodeHelpers.PCtoStack(); //Adds the PC to the stack
+            int exec = GetLowestActiveBit();
+
+            if (exec == -1)
+                throw new Exception($"Error while processing Interrupt at PC:{pc} OP:{opcode}");
+
+            switch (exec)
+            {
+                case 0: OpcodeHelpers.CALL(0x0040); break;
+                case 1: OpcodeHelpers.CALL(0x0048); break;
+                case 2: OpcodeHelpers.CALL(0x0050); break;
+                case 3: OpcodeHelpers.CALL(0x0058); break;
+                case 4: OpcodeHelpers.CALL(0x0060); break;
+            }
+
+            //For some reason this breaks and starts overriding the whole memory through stack pointer
+            //(still need to evaluate if this is necessary after the instruction is called)
+            //OpcodeHelpers.RETI();
+
+            return;
         }
 
-        public static byte GetByteFromPC()
+        public static int GetLowestActiveBit()
         {
-            byte value = memory[pc];
-            pc += 0x1;
-            return value;
-        }
+            byte bitSum = (byte)(CPU.IFRegister & CPU.IERegister);
 
-        public static void BootSequence()
-        {
-            //Clear and Load ROMs
-            ClearMemory();
-            LoadRomToMemory();
-            LoadBootROM();
-        }
+            //Bit 0 - VBlank
+            if ((bitSum & 0x01) == 0x1)
+            {
+                IFRegister &= 0xFE;
+                return 0;
+            }
 
-        public static void UnmapBootRom()
-        {
-            for(int i = 0x0; i < bootROM.Length-1; i++)
-                memory[i] = Cartridge.ROM[i];
-        }
+            //Bit 1 - LCD Stat
+            if ((bitSum & 0x02) == 0x2)
+            {
+                IFRegister &= 0xFD;
+                return 1;
+            }
 
-        public static void ClearMemory()
-        {
-            for (int i = 0; i < memory.Length; i++)
-                memory[i] = 0x0;
-        }
+            //Bit 2 - Timer Overflow
+            if ((bitSum & 0x04) == 0x4)
+            {
+                IFRegister &= 0xFB;
+                return 2;
+            }
 
-        static void LoadBootROM()
-        {
-            // Boot ROM overlays the first 256 bytes
-            for (int i = 0x0; i < bootROM.Length && i <= 0xFF; i++)
-                memory[i] = bootROM[i];
-        }
+            //Bit 3 - Serial Transfer
+            if ((bitSum & 0x08) == 0x8)
+            {
+                IFRegister &= 0xF7;
+                return 3;
+            }
 
-        static void LoadRomToMemory()
-        {
-            // Load ROM starting at 0x0000 (but boot ROM will overlay it temporarily)
-            for (int i = 0x0; i < Cartridge.ROM.Length && i <= 0x7FFF; i++)
-                memory[i] = Cartridge.ROM[i];
-        }
+            //Bit 4 - Joypad Input
+            if ((bitSum & 0x10) == 0x10)
+            {
+                IFRegister &= 0xEF;
+                return 4;
+            }
 
-        public static void Fetch()
-        {
-            if (pc >= memory.Length)
-                pc = 0xFFFF-0x1;
-
-            opcode = memory[pc];
-            pc += 1;
-        }
-
-        public static void Decode()
-        {
-            //op_Prefix = (byte)(opcode >> 12 & 0xf);
-            //op_X = (byte)(opcode >> 8 & 0xf);
-            //op_Y = (byte)(opcode >> 4 & 0xf);
-            //op_N = (byte)(opcode & 0xf);
-        }
-
-        public static void Execute()
-        {
-            //ExecuteOpcode
-            ExecuteOpcode(opcode);
+            return -1;
         }
     }
 }
