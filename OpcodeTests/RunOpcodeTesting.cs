@@ -413,7 +413,7 @@ namespace OpcodeTests
         [TestMethod] public void Test0xF5() { TestOpcode(0xF5, LoadTests("F5")); }
         [TestMethod] public void Test0xF6() { TestOpcode(0xF6, LoadTests("F6")); }
         [TestMethod] public void Test0xF7() { TestOpcode(0xF7, LoadTests("F7")); }
-        [TestMethod] public void Test0xF8() { Assert.Inconclusive(); }
+        [TestMethod] public void Test0xF8() { TestOpcode(0xF8, LoadTests("F8")); }
         [TestMethod] public void Test0xF9() { TestOpcode(0xF9, LoadTests("F9")); }
         [TestMethod] public void Test0xFA() { TestOpcode(0xFA, LoadTests("FA")); }
         [TestMethod] public void Test0xFB() { Assert.IsTrue(true); }

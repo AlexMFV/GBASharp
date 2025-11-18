@@ -336,7 +336,7 @@ namespace GBASharp
         public static void Code0xF5() { OpcodeHelpers.PUSHxAF(); }
         public static void Code0xF6() { OpcodeHelpers.OR(CPU.GetByteFromPC()); }
         public static void Code0xF7() { OpcodeHelpers.RST(6); }
-        public static void Code0xF8() { Console.WriteLine("(F8 Not Implemented)"); }
+        public static void Code0xF8() { OpcodeHelpers.LDxHLSP(CPU.GetByteFromPC()); }
         public static void Code0xF9() { OpcodeHelpers.LDxSP16(CPU.HL_Register); }
         public static void Code0xFA() { OpcodeHelpers.LDxA(CPU.memory[CPU.GetWordFromPC()]); }
         public static void Code0xFB() { OpcodeHelpers.EI(); }
@@ -611,7 +611,21 @@ namespace GBASharp
 
             CPU.memory[0xff00 + address] = value;
         }
-        
+
+        public static void LDxHLSP(byte value)
+        {
+            sbyte signed = (sbyte)value; //Convert to signed
+            ushort sum = (ushort)((CPU.reg_sp & 0xff) + value);
+            //Add to sp
+
+            SetFlagZ(false);
+            SetFlagN(false);
+            SetFlagH(((CPU.reg_sp & 0x0F) + (signed & 0x0F)) > 0x0F); //Set if overflow from bit 3
+            SetFlagC(((CPU.reg_sp & 0xFF) + (byte)signed) > 0xFF); //Set if overflow from 7 bit
+
+            CPU.HL_Register = (ushort)(CPU.reg_sp + signed);
+        }
+
         public static void LDIOxA(byte address) { CPU.A_Register = CPU.memory[0xff00 + address]; }
 
         public static void LDxA(byte value) { CPU.A_Register = value; }

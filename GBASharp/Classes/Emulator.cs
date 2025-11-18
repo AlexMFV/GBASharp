@@ -20,7 +20,7 @@ namespace GBASharp
         public static void Setup()
         {
             RomLoader.LoadBootRom("dmg_boot.bin");
-            RomLoader.LoadRom("drmario.gb");
+            RomLoader.LoadRom("02-interrupts.gb"); //blargg test roms "cputest"
             CPU.BootSequence();
             PPU.InitRegisters();
             cpuManager = new CycleManager(CPU.ResetCycleCounter);
